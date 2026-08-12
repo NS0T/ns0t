@@ -1,0 +1,961 @@
+(function () {
+  const toggle = document.getElementById("theme-toggle");
+  if (!toggle) return;
+
+  function syncToggleState() {
+    const isDark =
+      document.documentElement.getAttribute("data-theme") === "dark";
+    toggle.setAttribute("aria-pressed", String(isDark));
+  }
+
+  syncToggleState();
+
+  toggle.addEventListener("click", () => {
+    const current =
+      document.documentElement.getAttribute("data-theme") === "dark"
+        ? "dark"
+        : "light";
+    const next = current === "dark" ? "light" : "dark";
+
+    document.documentElement.setAttribute("data-theme", next);
+
+    try {
+      localStorage.setItem("theme", next);
+    } catch (e) {}
+
+    syncToggleState();
+  });
+})();
+
+(function () {
+  const header = document.querySelector(".site-header");
+  const threshold = 40;
+  let ticking = false;
+
+  function updateHeader() {
+    if (window.scrollY > threshold) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
+    }
+    ticking = false;
+  }
+
+  window.addEventListener("scroll", function () {
+    if (!ticking) {
+      requestAnimationFrame(updateHeader);
+      ticking = true;
+    }
+  });
+})();
+
+(function () {
+  const menuButton = document.querySelector(".header-toggle");
+  const player = document.querySelector(".mp-card");
+  const header = document.querySelector(".site-header");
+  const headerInner = document.querySelector(".header-inner");
+  const phoneViewport = window.matchMedia("(max-width: 768px)");
+
+  if (!menuButton || !player || !header || !headerInner) return;
+
+  const playerParent = player.parentNode;
+  const playerNextSibling = player.nextSibling;
+
+  function closePlayer() {
+    player.classList.remove("is-open");
+    header.classList.remove("menu-open");
+    menuButton.setAttribute("aria-expanded", "false");
+  }
+
+  function syncPlayerLocation() {
+    closePlayer();
+
+    if (phoneViewport.matches) {
+      if (player.parentNode !== headerInner) {
+        headerInner.append(player);
+      }
+    } else {
+      if (player.parentNode === headerInner) {
+        playerParent.insertBefore(player, playerNextSibling);
+      }
+    }
+  }
+
+  menuButton.setAttribute("aria-expanded", "false");
+  menuButton.setAttribute("aria-controls", "music-player");
+  player.id = "music-player";
+
+  menuButton.addEventListener("click", () => {
+    if (!phoneViewport.matches) return;
+
+    const isOpen = player.classList.toggle("is-open");
+    header.classList.toggle("menu-open", isOpen);
+    menuButton.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  document.addEventListener("pointerdown", (event) => {
+    if (
+      phoneViewport.matches &&
+      player.classList.contains("is-open") &&
+      !header.contains(event.target)
+    ) {
+      closePlayer();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closePlayer();
+  });
+
+  header.querySelectorAll(".header-nav a").forEach((link) => {
+    link.addEventListener("click", closePlayer);
+  });
+
+  phoneViewport.addEventListener("change", syncPlayerLocation);
+  syncPlayerLocation();
+})();
+
+const DISCORD_USER_ID = "1293228247341072496";
+
+const $ = (id) => document.getElementById(id);
+
+function setImage(img, placeholder, src) {
+  if (!img) return;
+
+  if (!src) {
+    img.style.display = "none";
+    if (placeholder) placeholder.style.display = "flex";
+    return;
+  }
+
+  img.onload = () => {
+    img.style.display = "block";
+    if (placeholder) placeholder.style.display = "none";
+  };
+
+  img.onerror = () => {
+    img.style.display = "none";
+    if (placeholder) placeholder.style.display = "flex";
+  };
+
+  img.src = src;
+}
+
+function setBanner(user) {
+  const bannerBox = $("profile-banner");
+  const bannerImg = $("profile-banner-img");
+  const profileCard = document.querySelector(".profile-card");
+
+  if (!bannerBox || !bannerImg) return;
+
+  if (!user || !user.banner) {
+    bannerImg.onload = null;
+    bannerImg.onerror = null;
+    bannerImg.removeAttribute("src");
+    bannerBox.hidden = true;
+    if (profileCard) profileCard.classList.remove("has-banner");
+    return;
+  }
+
+  const ext = user.banner.startsWith("a_") ? "gif" : "png";
+  const bannerURL = `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${ext}?size=600`;
+
+  bannerImg.onload = () => {
+    bannerBox.hidden = false;
+    if (profileCard) profileCard.classList.add("has-banner");
+  };
+
+  bannerImg.onerror = () => {
+    bannerBox.hidden = true;
+    if (profileCard) profileCard.classList.remove("has-banner");
+  };
+
+  bannerImg.src = bannerURL;
+}
+
+function setAvatarDecoration(user) {
+  const deco = $("avatar-decoration");
+  if (!deco) return;
+
+  const decoData = user && user.avatar_decoration_data;
+
+  if (!decoData || !decoData.asset) {
+    deco.onload = null;
+    deco.onerror = null;
+    deco.removeAttribute("src");
+    deco.hidden = true;
+    return;
+  }
+
+  const decoURL = `https://cdn.discordapp.com/avatar-decoration-presets/${decoData.asset}.png?size=160`;
+
+  deco.onload = () => {
+    deco.hidden = false;
+  };
+
+  deco.onerror = () => {
+    deco.hidden = true;
+  };
+
+  deco.src = decoURL;
+}
+
+async function updateLanyard() {
+  try {
+    const response = await fetch(
+      `https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`,
+    );
+
+    const { success, data } = await response.json();
+
+    if (!success) return;
+
+    const avatar = $("discord-avatar-img");
+    const avatarPlaceholder = document.querySelector(".avatar-placeholder");
+
+    const avatarURL = `https://cdn.discordapp.com/avatars/${data.discord_user.id}/${data.discord_user.avatar}.png?size=512`;
+
+    setImage(avatar, avatarPlaceholder, avatarURL);
+    setBanner(data.discord_user);
+    setAvatarDecoration(data.discord_user);
+
+    $("discord-username").textContent =
+      data.discord_user.global_name || data.discord_user.username;
+
+    const status = data.discord_status;
+
+    $("status-text").textContent =
+      status.charAt(0).toUpperCase() + status.slice(1);
+
+    $("status-dot").className = `status-dot ${status}`;
+
+    const smallAvatar = $("discord-avatar-small");
+    setImage(smallAvatar, null, avatarURL);
+    $("discord-tag").textContent = `@${data.discord_user.username}`;
+    $("small-status-text").textContent =
+      status.charAt(0).toUpperCase() + status.slice(1);
+    $("small-status-dot").className = `status-dot ${status}`;
+
+    const spotify = data.spotify;
+    if (spotify) {
+      $("spotify-song").textContent = spotify.song || "Unknown track";
+      $("spotify-artist").textContent = spotify.artist || "Unknown artist";
+      setImage($("spotify-cover"), null, spotify.album_art_url);
+    } else {
+      $("spotify-song").textContent = "Nothing Playing";
+      $("spotify-artist").textContent = "Spotify Offline";
+      setImage($("spotify-cover"), null, null);
+    }
+
+    const activities = data.activities || [];
+
+    const activity = activities.find((a) => a.type === 0);
+
+    const card = $("activity-card");
+    const name = $("activity-name");
+    const details = $("activity-details");
+    const icon = $("activity-icon");
+    const dot = $("act-dot-activity");
+    const iconPlaceholder = document.querySelector(".activity-placeholder");
+    const divider = $("activity-divider");
+    const profileCard = document.querySelector(".profile-card");
+
+    if (activity) {
+      card.hidden = false;
+      if (divider) divider.hidden = false;
+      if (profileCard) profileCard.classList.remove("no-activity");
+
+      name.textContent = activity.name || "Playing a game";
+
+      details.textContent = activity.details || activity.state || "Active now";
+
+      let imageURL = null;
+      if (activity.assets && activity.assets.large_image) {
+        if (activity.assets.large_image.startsWith("mp:external")) {
+          imageURL = activity.assets.large_image.replace(
+            /mp:external\/([^\/]*)\/(.*)/,
+            "https://$2",
+          );
+        } else {
+          imageURL = `https://cdn.discordapp.com/app-assets/${activity.application_id}/${activity.assets.large_image}.png`;
+        }
+      }
+
+      setImage(icon, iconPlaceholder, imageURL);
+    } else {
+      card.hidden = true;
+      if (divider) divider.hidden = true;
+      if (profileCard) profileCard.classList.add("no-activity");
+
+      setImage(icon, iconPlaceholder, null);
+    }
+
+    if (dot) dot.className = `status-dot ${status}`;
+  } catch (err) {
+    console.error("Lanyard Error:", err);
+  }
+}
+
+updateLanyard();
+setInterval(updateLanyard, 5000);
+
+function updateAmmanTime() {
+  const now = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Amman",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  }).format(new Date());
+
+  $("current-time").textContent = now;
+  $("timezone-name").textContent = "Asia/Amman";
+}
+
+updateAmmanTime();
+setInterval(updateAmmanTime, 1000);
+const playlist = [
+  {
+    name: "Way 2 Sexy",
+    artist: "Drake",
+    src: "music/Way2Sexy.mp3",
+    cover: "music/cover/drake.jpg",
+  },
+  {
+    name: "Figure.09",
+    artist: "Linkin Park",
+    src: "music/Figure.09.mp3",
+    cover: "music/cover/meteora.jpg",
+  },
+  {
+    name: "ICH BRING DIR KEINE BLUMEN",
+    artist: "Dardan",
+    src: "music/ICH BRING DIR KEINE BLUMEN.mp3",
+    cover: "music/cover/cover1.jpg",
+  },
+  {
+    name: "Jezebel",
+    artist: "Lithe",
+    src: "music/Jezebel.mp3",
+    cover: "music/cover/lithe.jpg",
+  },
+  {
+    name: "Let It Happen",
+    artist: "Tame Impala",
+    src: "music/Let It Happen.mp3",
+    cover: "music/cover/currents.jpg",
+  },
+  {
+    name: "loser.",
+    artist: "Stheppi",
+    src: "music/loser..mp3",
+    cover: "music/cover/shteppi.jpg",
+  },
+  {
+    name: "Morë",
+    artist: "Yeat",
+    src: "music/Morë.mp3",
+    cover: "music/cover/2093.jpg",
+  },
+  {
+    name: "One Two",
+    artist: "Future",
+    src: "music/One Two.mp3",
+    cover: "music/cover/realme.jpg",
+  },
+  {
+    name: "BLITZ!",
+    artist: "SSJ Daki",
+    src: "music/BLITZ!.mp3",
+    cover: "music/cover/blitz.jpg",
+  },
+];
+
+(function () {
+  let trackIndex = 0;
+  let isPlaying = false;
+
+  const audio = document.getElementById("player-audio");
+  if (!audio) return;
+
+  const coverBtn = document.getElementById("mp-cover-btn");
+  const coverImg = document.getElementById("player-cover");
+  const songEl = document.getElementById("player-song");
+  const artistEl = document.getElementById("player-artist");
+  const progressEl = document.getElementById("player-progress");
+  const volumeEl = document.getElementById("player-volume");
+  const playBtn = document.getElementById("player-play");
+  const playIcon = document.getElementById("player-play-icon");
+  const pauseIcon = document.getElementById("player-pause-icon");
+  const prevBtn = document.getElementById("player-prev");
+  const nextBtn = document.getElementById("player-next");
+
+  const progressFill = document.getElementById("progress-fill");
+  const progressThumb = document.getElementById("progress-thumb");
+  const volumeFill = document.getElementById("volume-fill");
+  const volumeThumb = document.getElementById("volume-thumb");
+
+  function updateSliderVisual(inputEl, fillEl, thumbEl) {
+    const min = Number(inputEl.min) || 0;
+    const max = Number(inputEl.max) || 100;
+    const value = Number(inputEl.value) || 0;
+    const percent = max > min ? ((value - min) / (max - min)) * 100 : 0;
+
+    if (window.matchMedia("(max-width: 768px)").matches) {
+      fillEl.style.width = percent + "%";
+      fillEl.style.height = "";
+      thumbEl.style.left = percent + "%";
+      thumbEl.style.bottom = "";
+    } else {
+      fillEl.style.height = percent + "%";
+      fillEl.style.width = "";
+      thumbEl.style.bottom = percent + "%";
+      thumbEl.style.left = "";
+    }
+  }
+
+  function loadTrack(index, autoplay) {
+    trackIndex = (index + playlist.length) % playlist.length;
+    const track = playlist[trackIndex];
+
+    coverImg.src = track.cover;
+    songEl.textContent = track.name;
+    artistEl.textContent = track.artist;
+
+    audio.src = track.src;
+    progressEl.value = 0;
+
+    if (autoplay) {
+      audio.play();
+      isPlaying = true;
+      updatePlayIcon();
+    }
+  }
+
+  function updatePlayIcon() {
+    playIcon.style.display = isPlaying ? "none" : "block";
+    pauseIcon.style.display = isPlaying ? "block" : "none";
+  }
+
+  function togglePlay() {
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play();
+    }
+    isPlaying = !isPlaying;
+    updatePlayIcon();
+  }
+
+  coverBtn.addEventListener("click", togglePlay);
+  playBtn.addEventListener("click", togglePlay);
+  prevBtn.addEventListener("click", () => loadTrack(trackIndex - 1, isPlaying));
+  nextBtn.addEventListener("click", () => loadTrack(trackIndex + 1, isPlaying));
+
+  audio.addEventListener("loadedmetadata", () => {
+    progressEl.max = audio.duration || 100;
+  });
+
+  audio.addEventListener("timeupdate", () => {
+    progressEl.value = audio.currentTime;
+    updateSliderVisual(progressEl, progressFill, progressThumb);
+  });
+
+  audio.addEventListener("ended", () => {
+    loadTrack(trackIndex + 1, true);
+  });
+
+  progressEl.addEventListener("input", () => {
+    audio.currentTime = progressEl.value;
+    updateSliderVisual(progressEl, progressFill, progressThumb);
+  });
+
+  volumeEl.addEventListener("input", () => {
+    audio.volume = volumeEl.value / 100;
+    updateSliderVisual(volumeEl, volumeFill, volumeThumb);
+  });
+
+  audio.volume = volumeEl.value / 100;
+  updateSliderVisual(progressEl, progressFill, progressThumb);
+  updateSliderVisual(volumeEl, volumeFill, volumeThumb);
+  loadTrack(0, false);
+
+  window.matchMedia("(max-width: 768px)").addEventListener("change", () => {
+    updateSliderVisual(progressEl, progressFill, progressThumb);
+    updateSliderVisual(volumeEl, volumeFill, volumeThumb);
+  });
+
+  document.body.classList.add("no-scroll");
+
+  const overlay = document.getElementById("enter-overlay");
+
+  if (overlay) {
+    overlay.addEventListener(
+      "click",
+      () => {
+        overlay.classList.add("hidden");
+        document.body.classList.remove("no-scroll");
+        document.body.classList.add("has-entered");
+
+        setTimeout(() => {
+          overlay.style.display = "none";
+        }, 500);
+
+        if (!isPlaying) {
+          togglePlay();
+        }
+      },
+      { once: true },
+    );
+  }
+})();
+(function () {
+  const sections = document.querySelectorAll(
+    ".about-card, .work-container, .skills-container, .tools-container, .contact-container",
+  );
+
+  if (!sections.length || !("IntersectionObserver" in window)) return;
+
+  const reveal = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.12 },
+  );
+
+  sections.forEach((section) => {
+    section.classList.add("reveal");
+    reveal.observe(section);
+  });
+})();
+(function () {
+  const form = document.getElementById("contact-form");
+  const status = document.getElementById("contact-status");
+  if (!form) return;
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const submitBtn = form.querySelector(".contact-submit");
+    const data = new FormData(form);
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending...";
+    status.textContent = "";
+    status.className = "contact-status";
+
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: data,
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        status.textContent = "Message sent, thanks!";
+        status.classList.add("success");
+        form.reset();
+      } else {
+        status.textContent = "Something went wrong. Try again.";
+        status.classList.add("error");
+      }
+    } catch (err) {
+      status.textContent = "Network error. Try again.";
+      status.classList.add("error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Send Message";
+    }
+  });
+})();
+
+const PORTFOLIO_SUPABASE_URL = "https://fhwrermokfjhkfjtzhms.supabase.co";
+const PORTFOLIO_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZod3Jlcm1va2ZqaGtmanR6aG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1OTM1NzgsImV4cCI6MjEwMTE2OTU3OH0.1bi4aRYhzaKle8lKLd5g_cA4Getm-UooUd5efZ6pWRc";
+
+const portfolioClient = window.supabase.createClient(
+  PORTFOLIO_SUPABASE_URL,
+  PORTFOLIO_SUPABASE_ANON_KEY,
+);
+
+function renderWorkCard(item, isLast) {
+  const a = document.createElement("a");
+  a.href = item.project_url || "#";
+  a.target = "_blank";
+  a.className = isLast ? "work-card-last" : "work-card";
+
+  a.innerHTML = `
+    <img src="${item.image_url}" class="work-logo" alt="${item.title}">
+    <div class="work-card-info">
+      <h4 class="work-name">${item.title}</h4>
+      <p class="work-summary">${item.description || ""}</p>
+    </div>
+    <span class="work-arrow">&rarr;</span>
+  `;
+
+  return a;
+}
+
+function renderSimpleCard(item, cardClass) {
+  const div = document.createElement("div");
+  div.className = cardClass;
+
+  div.innerHTML = `
+    <img src="${item.image_url}" alt="${item.title}">
+    <h3 class="skill-name">${item.title}</h3>
+  `;
+
+  return div;
+}
+
+async function loadPortfolioItems() {
+  const workGrid = $("work-grid");
+  const skillsGrid = $("skills-grid");
+  const toolsGrid = $("tools-grid");
+
+  const { data, error } = await portfolioClient
+    .from("portfolio_items")
+    .select("*")
+    .order("sort_order");
+
+  if (error) {
+    console.error("Portfolio load error:", error);
+    return;
+  }
+
+  if (!data) return;
+
+  const work = data.filter((item) => item.category === "work");
+  const skills = data.filter((item) => item.category === "skills");
+  const tools = data.filter((item) => item.category === "tools");
+
+  if (workGrid) {
+    workGrid.innerHTML = "";
+    work.forEach((item, index) => {
+      workGrid.appendChild(renderWorkCard(item, index === work.length - 1));
+    });
+  }
+
+  if (skillsGrid) {
+    skillsGrid.innerHTML = "";
+    skills.forEach((item) => {
+      skillsGrid.appendChild(renderSimpleCard(item, "skills-card"));
+    });
+  }
+
+  if (toolsGrid) {
+    toolsGrid.innerHTML = "";
+    tools.forEach((item) => {
+      toolsGrid.appendChild(renderSimpleCard(item, "tools-card"));
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadPortfolioItems);
+
+function SmoothScroll(target, speed, smooth) {
+  if (target === document)
+    target =
+      document.scrollingElement ||
+      document.documentElement ||
+      document.body.parentNode ||
+      document.body;
+
+  var moving = false;
+  var pos = target.scrollTop;
+  var frame =
+    target === document.body && document.documentElement
+      ? document.documentElement
+      : target;
+
+  target.addEventListener("wheel", scrolled, { passive: false });
+
+  document.addEventListener("click", handleAnchorClick);
+
+  function scrolled(e) {
+    e.preventDefault();
+
+    var delta = normalizeWheelDelta(e);
+
+    scrollTo(pos + -delta * speed);
+  }
+
+  function handleAnchorClick(e) {
+    var link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+
+    var id = link.getAttribute("href").slice(1);
+    if (!id) return;
+
+    var el = document.getElementById(id);
+    if (!el) return;
+
+    e.preventDefault();
+
+    var offset = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+    var destination =
+      el.getBoundingClientRect().top + target.scrollTop - offset;
+
+    scrollTo(destination);
+  }
+
+  function scrollTo(newPos) {
+    pos = Math.max(
+      0,
+      Math.min(newPos, target.scrollHeight - frame.clientHeight),
+    );
+    if (!moving) update();
+  }
+
+  function normalizeWheelDelta(e) {
+    var deltaY = e.deltaY;
+
+    if (e.deltaMode === 1) deltaY *= 18;
+    else if (e.deltaMode === 2) deltaY *= frame.clientHeight;
+
+    return -deltaY / 100;
+  }
+
+  function update() {
+    moving = true;
+
+    var delta = (pos - target.scrollTop) / smooth;
+
+    target.scrollTop += delta;
+
+    if (Math.abs(delta) > 0.5) requestFrame(update);
+    else moving = false;
+  }
+
+  var requestFrame = (function () {
+    return (
+      window.requestAnimationFrame ||
+      window.webkitRequestAnimationFrame ||
+      window.mozRequestAnimationFrame ||
+      window.oRequestAnimationFrame ||
+      window.msRequestAnimationFrame ||
+      function (func) {
+        window.setTimeout(func, 1000 / 50);
+      }
+    );
+  })();
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  SmoothScroll(document, 200, 12);
+});
+
+(function () {
+  function updateDynamicTooltips() {
+    const now = new Date();
+
+    const bdayLink = document.getElementById("birthday-link");
+    if (bdayLink) {
+      let nextBday = new Date(now.getFullYear(), 11, 1);
+      if (now > nextBday) nextBday.setFullYear(now.getFullYear() + 1);
+
+      const diff = nextBday - now;
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / (1000 * 60)) % 60);
+      bdayLink.setAttribute(
+        "data-tooltip",
+        `im born in 1/12, Next in: ${d}d ${h}h ${m}m `,
+      );
+    }
+
+    const codingLink = document.getElementById("coding-link");
+    if (codingLink) {
+      const currentMonth = now.toLocaleString("en-US", { month: "long" });
+      const startDate = new Date(2026, 0, 1);
+
+      let totalMonths =
+        (now.getFullYear() - startDate.getFullYear()) * 12 +
+        (now.getMonth() - startDate.getMonth());
+
+      let exp = "";
+      if (totalMonths < 12) {
+        exp = `${totalMonths} months`;
+      } else {
+        const yrs = Math.floor(totalMonths / 12);
+        const mos = totalMonths % 12;
+        exp = `${yrs} year${yrs > 1 ? "s" : ""} ${mos > 0 ? `and ${mos} month${mos > 1 ? "s" : ""}` : ""}`;
+      }
+      codingLink.setAttribute(
+        "data-tooltip",
+        `its july when i typed this now its ${currentMonth} and i've been coding for ${exp} now `,
+      );
+    }
+  }
+
+  updateDynamicTooltips();
+  setInterval(updateDynamicTooltips, 60000);
+})();
+
+(function syncGitHubGraphTheme() {
+  const graph = document.querySelector(".github-contributions-image");
+  if (!graph) return;
+
+  const lightGraph = "https://ghchart.rshah.org/2ea44f/NS0T";
+  const darkGraph = "https://ghchart.rshah.org/39d353/NS0T";
+
+  function updateGraph() {
+    const isDark = document.documentElement.dataset.theme === "dark";
+    const nextSource = isDark ? darkGraph : lightGraph;
+    if (graph.src !== nextSource) graph.src = nextSource;
+  }
+
+  updateGraph();
+  new MutationObserver(updateGraph).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+})();
+
+(function renderNativeGitHubContributions() {
+  const graph = document.getElementById("github-contributions-graph");
+  if (!graph) return;
+
+  const username = "NS0T";
+  const endpoint = `https://github-contributions-api.jogruber.de/v4/${username}?y=last`;
+  const dayNames = ["", "Mon", "", "Wed", "", "Fri", ""];
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  function dateFromString(value) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(Date.UTC(year, month - 1, day));
+  }
+
+  function formatYearLabel(contributions) {
+    const years = [
+      ...new Set(contributions.map((item) => item.date.slice(0, 4))),
+    ];
+    return years.length > 1
+      ? `${years[0]}–${years[years.length - 1]}`
+      : years[0];
+  }
+
+  function render(data) {
+    const contributions = data.contributions || [];
+    if (!contributions.length) throw new Error("No contribution data");
+
+    const byDate = new Map(contributions.map((item) => [item.date, item]));
+    const firstDate = dateFromString(contributions[0].date);
+    const lastDate = dateFromString(
+      contributions[contributions.length - 1].date,
+    );
+    const firstSunday = new Date(firstDate);
+    firstSunday.setUTCDate(firstSunday.getUTCDate() - firstSunday.getUTCDay());
+    const lastSaturday = new Date(lastDate);
+    lastSaturday.setUTCDate(
+      lastSaturday.getUTCDate() + (6 - lastSaturday.getUTCDay()),
+    );
+
+    const columns = [];
+    for (
+      let cursor = new Date(firstSunday);
+      cursor <= lastSaturday;
+      cursor.setUTCDate(cursor.getUTCDate() + 7)
+    ) {
+      const week = [];
+      for (let offset = 0; offset < 7; offset += 1) {
+        const date = new Date(cursor);
+        date.setUTCDate(cursor.getUTCDate() + offset);
+        const iso = date.toISOString().slice(0, 10);
+        week.push(byDate.get(iso) || { date: iso, count: 0, level: 0 });
+      }
+      columns.push(week);
+    }
+
+    const total =
+      data.total?.lastYear ??
+      contributions.reduce((sum, item) => sum + item.count, 0);
+    const months = [];
+    columns.forEach((week, index) => {
+      const first = dateFromString(week[0].date);
+      if (
+        index === 0 ||
+        first.getUTCDate() <= 7 ||
+        first.getUTCMonth() !==
+          dateFromString(columns[index - 1][0].date).getUTCMonth()
+      ) {
+        months.push({ name: monthNames[first.getUTCMonth()], index });
+      }
+    });
+
+    const monthMarkup = months
+      .map((month) => {
+        const left = (month.index / columns.length) * 100;
+        return `<span class="github-calendar-month" style="left:${left}%">${month.name}</span>`;
+      })
+      .join("");
+
+    const gridMarkup = columns
+      .map((week) =>
+        week
+          .map((item) => {
+            const date = dateFromString(item.date);
+            const label = `${item.count} contribution${item.count === 1 ? "" : "s"} on ${date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+            return `<span class="github-calendar-day" data-level="${item.level || 0}" title="${label}"></span>`;
+          })
+          .join(""),
+      )
+      .join("");
+
+    const dayMarkup = dayNames.map((day) => `<span>${day}</span>`).join("");
+    const legendMarkup = [0, 1, 2, 3, 4]
+      .map(
+        (level) =>
+          `<span class="github-calendar-day" data-level="${level}" aria-hidden="true"></span>`,
+      )
+      .join("");
+
+    graph.innerHTML = `
+      <div class="github-calendar-shell">
+        <div class="github-calendar-top">
+          <strong>${total} contributions in ${formatYearLabel(contributions)}</strong>
+          <span class="github-calendar-settings">Contribution settings⌄</span>
+        </div>
+        <div class="github-calendar-body">
+          <div class="github-calendar-day-labels">${dayMarkup}</div>
+          <div class="github-calendar-grid-wrap">
+            <div class="github-calendar-months">${monthMarkup}</div>
+            <div class="github-calendar-grid">${gridMarkup}</div>
+          </div>
+        </div>
+        <div class="github-calendar-bottom">
+          <span>meow</span>
+          <span class="github-calendar-legend"><span>Less</span>${legendMarkup}<span>More</span></span>
+        </div>
+      </div>`;
+  }
+
+  fetch(endpoint, { headers: { Accept: "application/json" } })
+    .then((response) => {
+      if (!response.ok)
+        throw new Error(`GitHub API returned ${response.status}`);
+      return response.json();
+    })
+    .then(render)
+    .catch(() => {
+      graph.innerHTML =
+        '<span class="github-contributions-error">GitHub contributions are unavailable right now.</span>';
+    });
+})();

@@ -3130,3 +3130,31 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
     transition: none;
   }
 }
+
+.guestbook-form-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.guestbook-form-actions .guestbook-submit,
+.guestbook-form-actions .word {
+  width: 100%;
+}
+
+.guestbook-form-actions .word {
+  display: block;
+  text-align: center;
+}
+
+.guestbook-form-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.guestbook-form-actions .word {
+  font-size: 10px;
+}

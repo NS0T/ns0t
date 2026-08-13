@@ -1526,7 +1526,8 @@ html[data-theme="dark"] .theme-icon-moon {
 
   .work-container,
   .skills-container,
-  .tools-container {
+  .tools-container,
+  .guestbook-section {
     width: calc(100% - 40px);
     max-width: 1200px;
     left: auto;
@@ -2569,13 +2570,10 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
     font-size: 5px;
   }
 }
-
 .guestbook-section {
   width: max(1000px, calc(100% - 40px));
-  margin: 0 auto 80px;
+  margin: 120px -430px 80px;
   scroll-margin-top: 130px;
-  margin-left: -450px;
-  margin-top: 120px;
 }
 
 .guestbook-heading {
@@ -2712,6 +2710,7 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
 
 .guestbook-form-footer {
   margin-top: auto;
+  flex-wrap: wrap;
 }
 
 .guestbook-status {
@@ -2737,9 +2736,21 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
 
 .guestbook-form-actions {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
+}
+
+.guestbook-form-actions .guestbook-submit,
+.guestbook-form-actions .word {
+  width: 100%;
+}
+
+.guestbook-form-actions .word {
+  display: block;
+  text-align: center;
+  font-size: 10px;
 }
 
 .guestbook-cancel,
@@ -2764,6 +2775,7 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
   padding: 0 12px;
   border-color: rgba(255, 255, 255, 0.22);
   color: rgba(255, 255, 255, 0.72);
+  width: 100%;
 }
 
 .guestbook-cancel:hover,
@@ -2871,6 +2883,7 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
 
 .guestbook-comment-meta {
   justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .guestbook-comment-actions {
@@ -2943,6 +2956,7 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
   display: flex;
   align-items: baseline;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .guestbook-reply-name {
@@ -3032,6 +3046,7 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
   justify-content: space-between;
   gap: 10px;
   margin-top: 9px;
+  flex-wrap: wrap;
 }
 
 .guestbook-reply-status {
@@ -3076,9 +3091,48 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
   text-align: center;
 }
 
+@media (max-width: 1600px) {
+  .guestbook-section {
+    width: 900px;
+    margin: 120px auto 80px;
+    scroll-margin-top: 130px;
+  }
+
+  .guestbook-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .guestbook-form,
+  .guestbook-feed-panel {
+    padding: 22px;
+  }
+}
+
+@media (max-width: 900px) {
+  .guestbook-section {
+    width: 100px;
+    margin: 120px auto 80px;
+    scroll-margin-top: 130px;
+  }
+
+  .guestbook-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .guestbook-form,
+  .guestbook-feed-panel {
+    padding: 22px;
+  }
+}
+
 @media (max-width: 760px) {
   .guestbook-section {
     width: calc(100% - 32px);
+    margin-top: 80px;
     margin-bottom: 56px;
   }
 
@@ -3116,10 +3170,27 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
 
   .guestbook-form-actions {
     align-self: flex-end;
+    width: 100%;
   }
 
   .guestbook-reply-fields {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 380px) {
+  .guestbook-section {
+    width: calc(100% - 20px);
+  }
+
+  .guestbook-form,
+  .guestbook-feed-panel {
+    padding: 16px;
+  }
+
+  .guestbook-comment-name,
+  .guestbook-reply-name {
+    max-width: 55vw;
   }
 }
 
@@ -3129,32 +3200,4 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
   .guestbook-submit {
     transition: none;
   }
-}
-
-.guestbook-form-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
-}
-
-.guestbook-form-actions .guestbook-submit,
-.guestbook-form-actions .word {
-  width: 100%;
-}
-
-.guestbook-form-actions .word {
-  display: block;
-  text-align: center;
-}
-
-.guestbook-form-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.guestbook-form-actions .word {
-  font-size: 10px;
 }

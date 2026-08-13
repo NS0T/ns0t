@@ -959,3 +959,563 @@ window.addEventListener("DOMContentLoaded", () => {
         '<span class="github-contributions-error">GitHub contributions are unavailable right now.</span>';
     });
 })();
+
+(function initGuestbook() {
+  const form = document.getElementById("guestbook-form");
+  const list = document.getElementById("guestbook-list");
+  const count = document.getElementById("guestbook-count");
+  const nameInput = document.getElementById("guestbook-name");
+  const messageInput = document.getElementById("guestbook-message");
+  const websiteInput = document.getElementById("guestbook-website");
+  const charCount = document.getElementById("guestbook-char-count");
+  const submitButton = document.getElementById("guestbook-submit");
+  const cancelButton = document.getElementById("guestbook-cancel");
+  const status = document.getElementById("guestbook-status");
+
+  if (
+    !form ||
+    !list ||
+    !count ||
+    !nameInput ||
+    !messageInput ||
+    !websiteInput ||
+    !charCount ||
+    !submitButton ||
+    !cancelButton ||
+    !status ||
+    typeof portfolioClient === "undefined"
+  ) {
+    return;
+  }
+
+  const TABLE_NAME = "guestbook_comments";
+  const SUBMISSION_COOLDOWN_MS = 45 * 1000;
+  const STORAGE_KEY = "guestbook-last-submission";
+  const REPLY_STORAGE_KEY = "guestbook-last-reply";
+  const REPLY_COOLDOWN_MS = 20 * 1000;
+  const OWNED_COMMENTS_STORAGE_KEY = "guestbook-owned-comments";
+  let editingComment = null;
+
+  function setStatus(message, type) {
+    status.textContent = message;
+    status.className = "guestbook-status";
+    if (type) status.classList.add(`is-${type}`);
+  }
+
+  function updateCharacterCount() {
+    charCount.textContent = `${messageInput.value.length} / 500`;
+  }
+
+  function getOwnedComments() {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem(OWNED_COMMENTS_STORAGE_KEY) || "{}",
+      );
+      return saved && typeof saved === "object" && !Array.isArray(saved)
+        ? saved
+        : {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function saveOwnedComments(ownedComments) {
+    localStorage.setItem(
+      OWNED_COMMENTS_STORAGE_KEY,
+      JSON.stringify(ownedComments),
+    );
+  }
+
+  function getOwnerToken(commentId) {
+    return getOwnedComments()[commentId] || null;
+  }
+
+  function rememberOwnerToken(commentId, token) {
+    const ownedComments = getOwnedComments();
+    ownedComments[commentId] = token;
+    saveOwnedComments(ownedComments);
+  }
+
+  function forgetOwnerToken(commentId) {
+    const ownedComments = getOwnedComments();
+    delete ownedComments[commentId];
+    saveOwnedComments(ownedComments);
+  }
+
+  function createOwnerToken() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+      return window.crypto.randomUUID();
+    }
+
+    throw new Error(
+      "Your browser does not support secure comment ownership tokens.",
+    );
+  }
+
+  function setEditingState(comment) {
+    editingComment = comment || null;
+    const isEditing = Boolean(editingComment);
+    form.classList.toggle("is-editing", isEditing);
+    cancelButton.hidden = !isEditing;
+    submitButton.querySelector("span").textContent = isEditing
+      ? "Save changes"
+      : "Send comment";
+  }
+
+  function resetGuestbookForm() {
+    form.reset();
+    updateCharacterCount();
+    setEditingState(null);
+  }
+
+  function startEditing(comment) {
+    if (!getOwnerToken(comment.id)) return;
+
+    nameInput.value =
+      comment.author_name === "Anonymous" ? "" : comment.author_name;
+    messageInput.value = comment.message;
+    updateCharacterCount();
+    setEditingState(comment);
+    setStatus("Editing your comment.", "");
+    form.scrollIntoView({ behavior: "smooth", block: "center" });
+    messageInput.focus();
+  }
+
+  function relativeTime(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "recently";
+
+    const seconds = Math.max(
+      0,
+      Math.floor((Date.now() - date.getTime()) / 1000),
+    );
+    const units = [
+      ["year", 31536000],
+      ["month", 2592000],
+      ["week", 604800],
+      ["day", 86400],
+      ["hour", 3600],
+      ["minute", 60],
+    ];
+
+    for (const [unit, size] of units) {
+      if (seconds >= size) {
+        const amount = Math.floor(seconds / size);
+        return `${amount} ${unit}${amount === 1 ? "" : "s"} ago`;
+      }
+    }
+
+    return "just now";
+  }
+
+  function createReplyElement(reply) {
+    const article = document.createElement("article");
+    article.className = "guestbook-reply";
+
+    const meta = document.createElement("div");
+    meta.className = "guestbook-reply-meta";
+
+    const author = document.createElement("strong");
+    author.className = "guestbook-reply-name";
+    author.textContent = reply.author_name;
+
+    const time = document.createElement("time");
+    time.className = "guestbook-reply-time";
+    time.dateTime = reply.created_at;
+    time.title = new Date(reply.created_at).toLocaleString();
+    time.textContent = relativeTime(reply.created_at);
+
+    const message = document.createElement("p");
+    message.className = "guestbook-reply-message";
+    message.textContent = reply.message;
+
+    meta.append(author, time);
+    article.append(meta, message);
+    return article;
+  }
+
+  function createReplyForm(comment) {
+    const form = document.createElement("form");
+    form.className = "guestbook-reply-form";
+    form.noValidate = true;
+
+    const fields = document.createElement("div");
+    fields.className = "guestbook-reply-fields";
+
+    const nameField = document.createElement("label");
+    nameField.textContent = "Your name";
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.maxLength = 32;
+    nameInput.minLength = 2;
+    nameInput.placeholder = "Your name";
+    nameInput.autocomplete = "nickname";
+    nameField.append(nameInput);
+
+    const messageField = document.createElement("label");
+    messageField.textContent = "Your reply";
+    const messageInput = document.createElement("textarea");
+    messageInput.maxLength = 500;
+    messageInput.placeholder = "Write a reply...";
+    messageField.append(messageInput);
+
+    fields.append(nameField, messageField);
+
+    const footer = document.createElement("div");
+    footer.className = "guestbook-reply-footer";
+    const replyStatus = document.createElement("p");
+    replyStatus.className = "guestbook-reply-status";
+    replyStatus.setAttribute("aria-live", "polite");
+    const submit = document.createElement("button");
+    submit.type = "submit";
+    submit.textContent = "Post reply";
+    footer.append(replyStatus, submit);
+
+    form.append(fields, footer);
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const authorName = nameInput.value.replace(/\s+/g, " ").trim();
+      const replyMessage = messageInput.value.trim();
+
+      if (authorName.length < 2 || authorName.length > 32) {
+        replyStatus.textContent = "Enter a name between 2 and 32 characters.";
+        replyStatus.className = "guestbook-reply-status is-error";
+        nameInput.focus();
+        return;
+      }
+
+      if (!replyMessage || replyMessage.length > 500) {
+        replyStatus.textContent =
+          "Your reply must be between 1 and 500 characters.";
+        replyStatus.className = "guestbook-reply-status is-error";
+        messageInput.focus();
+        return;
+      }
+
+      const lastReply = Number(localStorage.getItem(REPLY_STORAGE_KEY) || 0);
+      const remaining = REPLY_COOLDOWN_MS - (Date.now() - lastReply);
+      if (remaining > 0) {
+        replyStatus.textContent = `Please wait ${Math.ceil(remaining / 1000)} seconds before replying again.`;
+        replyStatus.className = "guestbook-reply-status is-error";
+        return;
+      }
+
+      submit.disabled = true;
+      submit.textContent = "Posting...";
+      replyStatus.textContent = "";
+      replyStatus.className = "guestbook-reply-status";
+
+      const { error } = await portfolioClient.from("guestbook_replies").insert({
+        comment_id: comment.id,
+        author_name: authorName,
+        message: replyMessage,
+      });
+
+      if (error) {
+        console.error("Guestbook reply error:", error);
+        replyStatus.textContent =
+          "Could not post your reply. Please try again.";
+        replyStatus.className = "guestbook-reply-status is-error";
+        submit.disabled = false;
+        submit.textContent = "Post reply";
+        return;
+      }
+
+      localStorage.setItem(REPLY_STORAGE_KEY, String(Date.now()));
+      await loadGuestbook();
+    });
+
+    return form;
+  }
+
+  function createCommentElement(comment) {
+    const article = document.createElement("article");
+    article.className = "guestbook-comment";
+
+    const meta = document.createElement("div");
+    meta.className = "guestbook-comment-meta";
+
+    const author = document.createElement("strong");
+    author.className = "guestbook-comment-name";
+    author.textContent = comment.author_name;
+
+    const time = document.createElement("time");
+    time.className = "guestbook-comment-time";
+    time.dateTime = comment.created_at;
+    time.title = new Date(comment.created_at).toLocaleString();
+    time.textContent = relativeTime(comment.created_at);
+
+    const message = document.createElement("p");
+    message.className = "guestbook-comment-message";
+    message.textContent = comment.message;
+
+    const actions = document.createElement("div");
+    actions.className = "guestbook-comment-actions";
+
+    const replyButton = document.createElement("button");
+    replyButton.className = "guestbook-comment-action is-reply";
+    replyButton.type = "button";
+    replyButton.textContent = "Reply";
+    replyButton.addEventListener("click", () => {
+      const existingForm = article.querySelector(".guestbook-reply-form");
+      if (existingForm) {
+        existingForm.remove();
+        replyButton.textContent = "Reply";
+        return;
+      }
+
+      article.append(createReplyForm(comment));
+      replyButton.textContent = "Close";
+      article.querySelector(".guestbook-reply-form input")?.focus();
+    });
+
+    actions.append(replyButton);
+
+    if (getOwnerToken(comment.id)) {
+      const editButton = document.createElement("button");
+      editButton.className = "guestbook-comment-action";
+      editButton.type = "button";
+      editButton.textContent = "Edit";
+      editButton.addEventListener("click", () => startEditing(comment));
+
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "guestbook-comment-action is-delete";
+      deleteButton.type = "button";
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", () => deleteComment(comment));
+
+      actions.append(editButton, deleteButton);
+    }
+
+    meta.append(author, time, actions);
+    article.append(meta, message);
+
+    if (comment.replies?.length) {
+      const replies = document.createElement("div");
+      replies.className = "guestbook-replies";
+      comment.replies.forEach((reply) =>
+        replies.append(createReplyElement(reply)),
+      );
+      article.append(replies);
+    }
+
+    return article;
+  }
+
+  function renderState(message) {
+    list.replaceChildren();
+    const state = document.createElement("p");
+    state.className = "guestbook-state";
+    state.textContent = message;
+    list.append(state);
+  }
+
+  function renderComments(comments) {
+    list.replaceChildren();
+
+    if (!comments.length) {
+      renderState("No comments yet. Be the first to leave one.");
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    comments.forEach((comment) =>
+      fragment.append(createCommentElement(comment)),
+    );
+    list.append(fragment);
+  }
+
+  async function loadGuestbook() {
+    renderState("Loading comments...");
+    count.textContent = "Loading...";
+
+    const {
+      data,
+      error,
+      count: total,
+    } = await portfolioClient
+      .from(TABLE_NAME)
+      .select("id, author_name, message, created_at", { count: "exact" })
+      .eq("is_visible", true)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error("Guestbook load error:", error);
+      renderState("Comments are unavailable right now.");
+      count.textContent = "Offline";
+      return;
+    }
+
+    const comments = data || [];
+    const commentIds = comments.map((comment) => comment.id);
+    let replies = [];
+
+    if (commentIds.length) {
+      const { data: replyData, error: replyError } = await portfolioClient
+        .from("guestbook_replies")
+        .select("id, comment_id, author_name, message, created_at")
+        .in("comment_id", commentIds)
+        .eq("is_visible", true)
+        .order("created_at", { ascending: true });
+
+      if (replyError)
+        console.error("Guestbook replies load error:", replyError);
+      else replies = replyData || [];
+    }
+
+    const repliesByComment = new Map();
+    replies.forEach((reply) => {
+      const existing = repliesByComment.get(reply.comment_id) || [];
+      existing.push(reply);
+      repliesByComment.set(reply.comment_id, existing);
+    });
+
+    const commentsWithReplies = comments.map((comment) => ({
+      ...comment,
+      replies: repliesByComment.get(comment.id) || [],
+    }));
+
+    renderComments(commentsWithReplies);
+    count.textContent = `${total || 0} comment${total === 1 ? "" : "s"}`;
+  }
+
+  async function deleteComment(comment) {
+    const ownerToken = getOwnerToken(comment.id);
+    if (!ownerToken) return;
+
+    const confirmed = window.confirm("Delete this comment permanently?");
+    if (!confirmed) return;
+
+    const { data: wasDeleted, error } = await portfolioClient.rpc(
+      "delete_guestbook_comment",
+      {
+        p_comment_id: comment.id,
+        p_owner_token: ownerToken,
+      },
+    );
+
+    if (error || !wasDeleted) {
+      console.error("Guestbook delete error:", error);
+      setStatus("Could not delete this comment. Please try again.", "error");
+      return;
+    }
+
+    forgetOwnerToken(comment.id);
+    if (editingComment && editingComment.id === comment.id)
+      resetGuestbookForm();
+    setStatus("Comment deleted.", "success");
+    await loadGuestbook();
+  }
+
+  messageInput.addEventListener("input", updateCharacterCount);
+  cancelButton.addEventListener("click", () => {
+    resetGuestbookForm();
+    setStatus("Edit cancelled.", "");
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (websiteInput.value.trim()) return;
+
+    const enteredName = nameInput.value.replace(/\s+/g, " ").trim();
+    const name = enteredName || "Anonymous";
+    const message = messageInput.value.trim();
+    const isEditing = Boolean(editingComment);
+
+    if (enteredName && (enteredName.length < 2 || enteredName.length > 32)) {
+      setStatus(
+        "Use a nickname between 2 and 32 characters, or leave it blank.",
+        "error",
+      );
+      nameInput.focus();
+      return;
+    }
+
+    if (!message || message.length > 500) {
+      setStatus("Your comment must be between 1 and 500 characters.", "error");
+      messageInput.focus();
+      return;
+    }
+
+    if (!isEditing) {
+      const lastSubmission = Number(localStorage.getItem(STORAGE_KEY) || 0);
+      const remaining = SUBMISSION_COOLDOWN_MS - (Date.now() - lastSubmission);
+
+      if (remaining > 0) {
+        setStatus(
+          `Please wait ${Math.ceil(remaining / 1000)} seconds before posting again.`,
+          "error",
+        );
+        return;
+      }
+    }
+
+    submitButton.disabled = true;
+    submitButton.querySelector("span").textContent = isEditing
+      ? "Saving..."
+      : "Sending...";
+    setStatus("", "");
+
+    try {
+      if (isEditing) {
+        const ownerToken = getOwnerToken(editingComment.id);
+        if (!ownerToken) throw new Error("Missing comment ownership token.");
+
+        const { data: wasUpdated, error } = await portfolioClient.rpc(
+          "update_guestbook_comment",
+          {
+            p_comment_id: editingComment.id,
+            p_owner_token: ownerToken,
+            p_author_name: name,
+            p_message: message,
+          },
+        );
+
+        if (error || !wasUpdated)
+          throw error || new Error("Comment update was rejected.");
+
+        resetGuestbookForm();
+        setStatus("Comment updated.", "success");
+      } else {
+        const ownerToken = createOwnerToken();
+        const { data: insertedComment, error } = await portfolioClient
+          .from(TABLE_NAME)
+          .insert({
+            author_name: name,
+            message,
+            owner_token: ownerToken,
+          })
+          .select("id")
+          .single();
+
+        if (error || !insertedComment)
+          throw error || new Error("Comment insert failed.");
+
+        rememberOwnerToken(insertedComment.id, ownerToken);
+        localStorage.setItem(STORAGE_KEY, String(Date.now()));
+        resetGuestbookForm();
+        setStatus("Comment sent. Thank you!", "success");
+      }
+
+      await loadGuestbook();
+    } catch (error) {
+      console.error("Guestbook save error:", error);
+      setStatus(
+        isEditing
+          ? "Could not update this comment. Please try again."
+          : "Could not send your comment. Please try again.",
+        "error",
+      );
+    } finally {
+      submitButton.disabled = false;
+      setEditingState(editingComment);
+    }
+  });
+
+  updateCharacterCount();
+  loadGuestbook();
+})();

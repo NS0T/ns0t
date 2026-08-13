@@ -400,88 +400,72 @@
 
         <section class="section-divider"></section>
 
+        <section class="guestbook-section" id="guestbook" aria-labelledby="guestbook-title">
+            <div class="guestbook-heading">
+                <h2 id="guestbook-title">Leave a comment</h2>
+            </div>
 
-        <h1 class="contact-title" id="contact">Contact</h1>
+            <div class="guestbook-layout">
+                <form id="guestbook-form" class="guestbook-form">
+                    <div class="guestbook-field">
+                        <label for="guestbook-name">Nickname <span>(optional)</span></label>
+                        <input
+                            id="guestbook-name"
+                            name="name"
+                            type="text"
+                            maxlength="32"
+                            autocomplete="nickname"
+                            autocapitalize="words"
+                            placeholder="Name (optional)"
+                        />
+                    </div>
 
-        <div class="contact-container">
-            <div class="contact-wrapper">
-                <form class="contact-form" id="contact-form">
-                    <input type="hidden" name="access_key" value="84f7e4f9-7025-416d-876d-3f341aa131ce" />
-                    <input type="checkbox" name="botcheck" class="hidden-field" style="display:none" />
+                    <div class="guestbook-field">
+                        <div class="guestbook-label-row">
+                            <label for="guestbook-message">Your message</label>
+                            <span id="guestbook-char-count" aria-live="polite">0 / 500</span>
+                        </div>
+                        <textarea
+                            id="guestbook-message"
+                            name="message"
+                            maxlength="500"
+                            minlength="1"
+                            autocapitalize="sentences"
+                            placeholder="Say something nice..."
+                            required
+                        ></textarea>
+                    </div>
 
-                    <input
-                        type="text"
-                        class="contact-input"
-                        name="name"
-                        placeholder="Name"
-                        required
-                    />
-                    <input
-                        type="email"
-                        class="contact-input"
-                        name="email"
-                        placeholder="Email"
-                        required
-                    />
-                    <textarea
-                        class="contact-input contact-message"
-                        name="message"
-                        placeholder="Message"
-                        required
-                    ></textarea>
+                    <label class="guestbook-honeypot" aria-hidden="true">
+                        Leave this field empty
+                        <input id="guestbook-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+                    </label>
 
-                    <button type="submit" class="contact-submit">
-                        Send Message
-                    </button>
-                    <p class="contact-status" id="contact-status"></p>
+                    <div class="guestbook-form-footer">
+                        <p id="guestbook-status" class="guestbook-status" aria-live="polite"></p>
+                        <div class="guestbook-form-actions">
+                            <button id="guestbook-cancel" class="guestbook-cancel" type="button" hidden>Cancel</button>
+                            <button id="guestbook-submit" class="guestbook-submit" type="submit">
+                                <span>Send comment</span>
+                                <span aria-hidden="true">→</span>
+                            </button>
+                        </div>
+                    </div>
                 </form>
 
-                <div class="contact-or">
-                    <span>Or contact with</span>
-                </div>
-
-                <div class="contact-links-card">
-                    <a
-                        href="https://www.instagram.com/ns00t/"
-                        class="contact-link-item"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <span class="contact-link-icon">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                                <path d="M12 2c-2.72 0-3.06.01-4.12.06-1.06.05-1.79.22-2.43.47-.66.26-1.22.6-1.77 1.16-.56.55-.9 1.11-1.16 1.77-.25.64-.42 1.37-.47 2.43C2 8.94 2 9.28 2 12s.01 3.06.06 4.12c.05 1.06.22 1.79.47 2.43.26.66.6 1.22 1.16 1.77.55.56 1.11.9 1.77 1.16.64.25 1.37.42 2.43.47C8.94 22 9.28 22 12 22s3.06-.01 4.12-.06c1.06-.05 1.79-.22 2.43-.47.66-.26 1.22-.6 1.77-1.16.56-.55.9-1.11 1.16-1.77.25-.64.42-1.37.47-2.43.05-1.06.06-1.4.06-4.12s-.01-3.06-.06-4.12c-.05-1.06-.22-1.79-.47-2.43-.26-.66-.6-1.22-1.16-1.77-.55-.56-1.11-.9-1.77-1.16-.64-.25-1.37-.42-2.43-.47C15.06 2.01 14.72 2 12 2zm0 1.8c2.67 0 2.99.01 4.04.06.98.04 1.51.21 1.86.34.47.18.8.4 1.15.75.35.35.57.68.75 1.15.13.35.29.88.34 1.86.05 1.05.06 1.37.06 4.04s-.01 2.99-.06 4.04c-.04.98-.21 1.51-.34 1.86-.18.47-.4.8-.75 1.15-.35.35-.68.57-1.15.75-.35.13-.88.29-1.86.34-1.05.05-1.37.06-4.04.06s-2.99-.01-4.04-.06c-.98-.04-1.51-.21-1.86-.34-.47-.18-.8-.4-1.15-.75-.35-.35-.57-.68-.75-1.15-.13-.35-.29-.88-.34-1.86C3.8 14.99 3.8 14.67 3.8 12s.01-2.99.06-4.04c.04-.98.21-1.51.34-1.86.18-.47.4-.8.75-1.15.35-.35.68-.57 1.15-.75.35-.13.88-.29 1.86-.34C9.01 3.8 9.33 3.8 12 3.8zm0 3.05a5.15 5.15 0 100 10.3 5.15 5.15 0 000-10.3zm0 8.5a3.35 3.35 0 110-6.7 3.35 3.35 0 010 6.7zm5.35-8.7a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/>
-                            </svg>
-                        </span>
-                        <span class="contact-link-label">Instagram</span>
-                    </a>
-
-                    <a
-                        href="https://discord.com/users/1293228247341072496"
-                        class="contact-link-item"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <span class="contact-link-icon">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                                <path d="M20.317 4.369a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.369a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.056 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 01.077-.01c3.927 1.793 8.18 1.793 12.061 0a.073.073 0 01.078.009c.12.099.246.198.373.292a.077.077 0 01-.006.127 12.3 12.3 0 01-1.873.892.076.076 0 00-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.029 19.84 19.84 0 006.002-3.03.077.077 0 00.032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.028zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-                            </svg>
-                        </span>
-                        <span class="contact-link-label">Discord</span>
-                    </a>
-
-                    <a href="mailto:theebahmad10@gmail.com" class="contact-link-item">
-                        <span class="contact-link-icon">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                            </svg>
-                        </span>
-                        <span class="contact-link-label">Email me Directly</span>
-                    </a>
+                <div class="guestbook-feed-panel" aria-labelledby="guestbook-feed-title">
+                    <div class="guestbook-feed-header">
+                        <div>
+                            <h3 id="guestbook-feed-title">Comments</h3>
+                        </div>
+                        <span id="guestbook-count" class="guestbook-count">Loading...</span>
+                    </div>
+                    <div id="guestbook-list" class="guestbook-list" aria-live="polite">
+                        <p class="guestbook-state">Loading comments...</p>
+                    </div>
                 </div>
             </div>
-        </div>
-
-
+        </section>
         <div class="easter-egg" id="easteregg">
             <a href="easteregg.html">?</a>
         </div>

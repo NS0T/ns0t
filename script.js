@@ -677,10 +677,24 @@ function SmoothScroll(target, speed, smooth) {
   document.addEventListener("click", handleAnchorClick);
 
   function scrolled(e) {
+    const scrollableParent = e.target.closest(
+      ".guestbook-feed-panel, .guestbook-list, .github-contributions .calender, .github-contributions-graph",
+    );
+
+    if (scrollableParent) {
+      const atTop = scrollableParent.scrollTop <= 0;
+      const atBottom =
+        Math.ceil(scrollableParent.scrollTop + scrollableParent) >=
+        scrollableParent.scrollHeight;
+
+      const scrollingdown = e.deltaY > 0;
+
+      if (!(scrollingdown && atBottom) && !(!sccrollingdown && atTop)) {
+        return;
+      }
+    }
     e.preventDefault();
-
     var delta = normalizeWheelDelta(e);
-
     scrollTo(pos + -delta * speed);
   }
 

@@ -1456,6 +1456,7 @@ html[data-theme="dark"] .theme-icon-moon {
     line-height: 1;
     text-align: center;
     transform: none;
+    transform: translate(270deg);
   }
 
   .profile-card-container,
@@ -3514,4 +3515,55 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
   overflow-y: auto;
   overscroll-behavior-y: contain;
   touch-action: pan-y;
+}
+.guestbook-gif-embed {
+  display: block;
+  width: min(100%, 320px);
+  aspect-ratio: 1 / 1;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #111214;
+}
+
+.guestbook-reply-gif-controls {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.guestbook-reply-gif-button,
+.guestbook-reply-gif-remove {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  background: #25262b;
+  color: #f5f5f5;
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.guestbook-reply-gif-button {
+  padding: 6px 8px;
+  font-weight: 800;
+  color: #ffdd57;
+}
+
+.guestbook-reply-gif-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.guestbook-reply-gif-preview img {
+  width: 72px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.guestbook-reply-gif-remove {
+  padding: 5px 6px;
 }

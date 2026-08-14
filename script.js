@@ -1066,6 +1066,8 @@ window.addEventListener("DOMContentLoaded", () => {
     let searchTimer = null;
     let activeRequest = null;
     let trendingLoaded = false;
+    let onReplyGifSelected = null;
+    let replyGifFocusTarget = null;
 
     function setPickerStatus(text) {
       pickerStatus.textContent = text;
@@ -1136,11 +1138,24 @@ window.addEventListener("DOMContentLoaded", () => {
 
         resultButton.append(image);
         resultButton.addEventListener("click", () => {
-          setSelectedGif({
+          const selectedGif = {
             id: String(item.id || item.slug || gifUrl),
             url: gifUrl,
             previewUrl: previewUrl || gifUrl,
-          });
+          };
+
+          if (onReplyGifSelected) {
+            const chooseForReply = onReplyGifSelected;
+            const focusTarget = replyGifFocusTarget;
+            onReplyGifSelected = null;
+            replyGifFocusTarget = null;
+            chooseForReply(selectedGif);
+            closePicker(false);
+            focusTarget?.focus();
+            return;
+          }
+
+          setSelectedGif(selectedGif);
           closePicker(false);
           messageInput.focus();
         });
@@ -1278,7 +1293,19 @@ window.addEventListener("DOMContentLoaded", () => {
       if (event.key === "Escape" && !picker.hidden) closePicker();
     });
 
-    return { setSelectedGif };
+    function openForReply(onSelect, focusTarget) {
+      if (typeof onSelect !== "function") return;
+
+      onReplyGifSelected = onSelect;
+      replyGifFocusTarget = focusTarget || null;
+      picker.hidden = false;
+      gifButton.setAttribute("aria-expanded", "true");
+      searchInput.focus();
+
+      if (!trendingLoaded) loadKlipy({ trending: true });
+    }
+
+    return { setSelectedGif, openForReply };
   }
 
   const gifPicker = createKlipyPicker();
@@ -1408,9 +1435,22 @@ window.addEventListener("DOMContentLoaded", () => {
     message.className = "guestbook-reply-message";
     renderTextWithLinks(message, reply.message);
 
+    let gif = null;
+    try {
+      const gifUrl = new URL(reply.gif_url);
+      if (gifUrl.protocol === "https:") {
+        gif = document.createElement("img");
+        gif.className = "guestbook-comment-gif";
+        gif.src = gifUrl.href;
+        gif.alt = "GIF attached to this reply";
+        gif.loading = "lazy";
+      }
+    } catch (error) {}
+
     meta.append(author, time);
     article.append(meta, message);
-    appendKlipyLinkPreview(article, reply.message);
+    if (gif) article.append(gif);
+    else appendTrustedGifPreview(article, reply.message);
     return article;
   }
 
@@ -1418,6 +1458,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const form = document.createElement("form");
     form.className = "guestbook-reply-form";
     form.noValidate = true;
+    let selectedReplyGif = null;
 
     const fields = document.createElement("div");
     fields.className = "guestbook-reply-fields";
@@ -1438,6 +1479,48 @@ window.addEventListener("DOMContentLoaded", () => {
     messageInput.maxLength = 500;
     messageInput.placeholder = "Write a reply...";
     messageField.append(messageInput);
+    const replyGifControls = document.createElement("div");
+    replyGifControls.className = "guestbook-reply-gif-controls";
+
+    const replyGifButton = document.createElement("button");
+    replyGifButton.type = "button";
+    replyGifButton.className = "guestbook-reply-gif-button";
+    replyGifButton.textContent = "GIF";
+    replyGifButton.setAttribute("aria-label", "Choose a GIF for this reply");
+
+    const replyGifPreview = document.createElement("div");
+    replyGifPreview.className = "guestbook-reply-gif-preview";
+    replyGifPreview.hidden = true;
+
+    const replyGifImage = document.createElement("img");
+    replyGifImage.alt = "Selected GIF";
+
+    const removeReplyGif = document.createElement("button");
+    removeReplyGif.type = "button";
+    removeReplyGif.textContent = "Remove GIF";
+    removeReplyGif.className = "guestbook-reply-gif-remove";
+
+    replyGifPreview.append(replyGifImage, removeReplyGif);
+    replyGifControls.append(replyGifButton, replyGifPreview);
+    messageField.append(replyGifControls);
+
+    function setReplyGif(gif) {
+      selectedReplyGif = gif || null;
+      replyGifPreview.hidden = !selectedReplyGif;
+
+      if (!selectedReplyGif) {
+        replyGifImage.removeAttribute("src");
+        return;
+      }
+
+      replyGifImage.src = selectedReplyGif.previewUrl || selectedReplyGif.url;
+    }
+
+    replyGifButton.addEventListener("click", () => {
+      gifPicker.openForReply(setReplyGif, messageInput);
+    });
+
+    removeReplyGif.addEventListener("click", () => setReplyGif(null));
 
     fields.append(nameField, messageField);
 
@@ -1458,6 +1541,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
       const authorName = nameInput.value.replace(/\s+/g, " ").trim();
       const replyMessage = messageInput.value.trim();
+      const replyGifUrl = selectedReplyGif?.url || null;
 
       if (authorName.length < 2 || authorName.length > 32) {
         replyStatus.textContent = "Enter a name between 2 and 32 characters.";
@@ -1466,9 +1550,9 @@ window.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      if (!replyMessage || replyMessage.length > 500) {
+      if ((!replyMessage && !replyGifUrl) || replyMessage.length > 500) {
         replyStatus.textContent =
-          "Your reply must be between 1 and 500 characters.";
+          "Add a reply message or GIF. Messages can be up to 500 characters.";
         replyStatus.className = "guestbook-reply-status is-error";
         messageInput.focus();
         return;
@@ -1500,6 +1584,7 @@ window.addEventListener("DOMContentLoaded", () => {
         comment_id: comment.id,
         author_name: authorName,
         message: replyMessage,
+        gif_url: replyGifUrl,
       });
 
       if (error) {
@@ -1747,6 +1832,89 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function getFirstHttpUrl(text) {
+    const match = String(text || "").match(/https?:\/\/[^\s<>"']+/i);
+    return match ? match[0] : null;
+  }
+
+  function appendDirectGif(container, src, alt) {
+    const gif = document.createElement("img");
+    gif.className = "guestbook-comment-gif";
+    gif.src = src;
+    gif.alt = alt;
+    gif.loading = "lazy";
+    container.append(gif);
+  }
+
+  function appendGifIframe(container, src, title) {
+    const frame = document.createElement("iframe");
+    frame.className = "guestbook-gif-embed";
+    frame.src = src;
+    frame.title = title;
+    frame.loading = "lazy";
+    frame.referrerPolicy = "no-referrer";
+    frame.setAttribute("allowfullscreen", "");
+    container.append(frame);
+  }
+
+  function appendTrustedGifPreview(container, text) {
+    const rawUrl = getFirstHttpUrl(text);
+    if (!rawUrl) return;
+
+    let url;
+    try {
+      url = new URL(rawUrl);
+    } catch {
+      return;
+    }
+
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    const path = url.pathname;
+
+    if (host === "klipy.com" && path.startsWith("/gifs/")) {
+      appendKlipyLinkPreview(container, rawUrl);
+      return;
+    }
+
+    if (host === "tenor.com" && path.startsWith("/view/")) {
+      const id = path.match(/-(\d+)\/?$/)?.[1];
+      if (id) {
+        appendGifIframe(
+          container,
+          `https://tenor.com/embed/${id}`,
+          "GIF from Tenor",
+        );
+      }
+      return;
+    }
+
+    if (host === "giphy.com" && path.startsWith("/gifs/")) {
+      const lastSegment = path.split("/").filter(Boolean).pop();
+      const id = lastSegment?.split("-").pop();
+      if (id && /^[A-Za-z0-9]+$/.test(id)) {
+        appendGifIframe(
+          container,
+          `https://giphy.com/embed/${id}`,
+          "GIF from Giphy",
+        );
+      }
+      return;
+    }
+
+    const trustedMediaHosts = new Set([
+      "media1.tenor.com",
+      "media.tenor.com",
+      "media.giphy.com",
+      "i.giphy.com",
+      "static.klipy.com",
+    ]);
+
+    const isDirectGif = /\.(gif|webp)$/i.test(path);
+    if (trustedMediaHosts.has(host) && isDirectGif) {
+      appendDirectGif(container, url.href, "GIF attachment");
+    }
+  }
+
   function renderComments(comments) {
     list.replaceChildren();
 
@@ -1793,7 +1961,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (commentIds.length) {
       const { data: replyData, error: replyError } = await portfolioClient
         .from("guestbook_replies")
-        .select("id, comment_id, author_name, message, created_at")
+        .select("id, comment_id, author_name, message, gif_url, created_at")
         .in("comment_id", commentIds)
         .eq("is_visible", true)
         .order("created_at", { ascending: true });

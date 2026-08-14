@@ -7,7 +7,7 @@
   --header-width: 960px;
   --header-width-scrolled: 680px;
 
-  --page-bg: #f3f1ed;
+  --page-bg: #f8edf6;
   --text-strong: #000000;
   --text-muted: #2f2f2f;
   --card-bg: #d9d9d9;
@@ -2102,7 +2102,6 @@ body.has-entered .profile-sidebar {
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
 
@@ -2754,7 +2753,7 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
 }
 
 .word {
-  color: #2744e7b2;
+  color: #818cf8;
 }
 
 .guestbook-cancel,
@@ -3204,4 +3203,315 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
   .guestbook-submit {
     transition: none;
   }
+}
+
+.guestbook-message-composer {
+  position: relative;
+}
+
+.guestbook-message-composer .guestbook-field textarea,
+.guestbook-message-composer textarea {
+  padding-bottom: 48px;
+}
+
+.guestbook-composer-tools {
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  display: flex;
+  align-items: center;
+}
+
+.guestbook-gif-button {
+  min-width: 34px;
+  height: 26px;
+  padding: 0 7px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.82);
+  font:
+    700 9px/1 "JetBrains Mono",
+    monospace;
+  letter-spacing: -0.04em;
+  cursor: pointer;
+  transition:
+    background 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    color 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    border-color 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.guestbook-gif-button:hover,
+.guestbook-gif-button[aria-expanded="true"] {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.guestbook-gif-button:active {
+  transform: scale(0.96);
+}
+
+.guestbook-gif-button:focus-visible,
+.guestbook-gif-picker button:focus-visible,
+.guestbook-gif-search-wrap input:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.74);
+  outline-offset: 2px;
+}
+
+.guestbook-gif-picker {
+  position: absolute;
+  z-index: 45;
+  bottom: calc(100% + 10px);
+  left: 0;
+  width: min(342px, calc(100vw - 72px));
+  max-height: 352px;
+  padding: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+  background: #17181b;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.48);
+  transform-origin: left bottom;
+}
+
+.guestbook-gif-picker[hidden] {
+  display: none;
+}
+
+.guestbook-gif-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 22px;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.92);
+  font:
+    700 10px "JetBrains Mono",
+    monospace;
+}
+
+.guestbook-gif-picker-header button {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  place-items: center;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font:
+    500 19px/1 "Space Grotesk",
+    sans-serif;
+  cursor: pointer;
+}
+
+.guestbook-gif-picker-header button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.guestbook-gif-search-wrap {
+  position: relative;
+  display: block;
+}
+
+.guestbook-gif-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 9px;
+  color: rgba(255, 255, 255, 0.42);
+  font:
+    18px/1 "Space Grotesk",
+    sans-serif;
+  pointer-events: none;
+  transform: translateY(-52%);
+}
+
+.guestbook-gif-search-wrap input {
+  display: block;
+  width: 100%;
+  height: 31px;
+  padding: 0 9px 0 29px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 7px;
+  outline: none;
+  background: #0e0f11;
+  color: #fff;
+  font:
+    500 10px "JetBrains Mono",
+    monospace;
+}
+
+.guestbook-gif-search-wrap input::placeholder {
+  color: rgba(255, 255, 255, 0.36);
+}
+
+.guestbook-gif-search-wrap input:focus {
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+.guestbook-gif-results {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  min-height: 106px;
+  max-height: 216px;
+  margin-top: 9px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
+}
+
+.guestbook-gif-results::-webkit-scrollbar {
+  width: 5px;
+}
+
+.guestbook-gif-results::-webkit-scrollbar-thumb {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.guestbook-gif-result {
+  position: relative;
+  display: block;
+  aspect-ratio: 1.42 / 1;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: #222329;
+  cursor: pointer;
+}
+
+.guestbook-gif-result img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    transform 170ms cubic-bezier(0.23, 1, 0.32, 1),
+    filter 170ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.guestbook-gif-result:hover,
+.guestbook-gif-result:focus-visible {
+  border-color: rgba(255, 255, 255, 0.78);
+}
+
+.guestbook-gif-result:hover img {
+  filter: brightness(1.08);
+  transform: scale(1.04);
+}
+
+.guestbook-gif-picker-status {
+  min-height: 14px;
+  margin: 8px 1px 0;
+  color: rgba(255, 255, 255, 0.48);
+  font:
+    500 8px/1.45 "JetBrains Mono",
+    monospace;
+}
+
+.guestbook-gif-picker-footer {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.28);
+  font:
+    500 8px "JetBrains Mono",
+    monospace;
+  text-align: right;
+}
+
+.guestbook-gif-picker-footer span {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 700;
+}
+
+.guestbook-gif-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 2px;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.guestbook-gif-preview[hidden] {
+  display: none;
+}
+
+.guestbook-gif-preview img {
+  display: block;
+  width: 68px;
+  height: 46px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.guestbook-gif-preview button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.58);
+  font:
+    600 8px "JetBrains Mono",
+    monospace;
+  cursor: pointer;
+}
+
+.guestbook-gif-preview button:hover {
+  color: #ff9b9b;
+}
+
+.guestbook-comment-gif {
+  display: block;
+  width: min(100%, 260px);
+  max-height: 190px;
+  margin-top: 8px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.guestbook-comment-message:empty {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .guestbook-gif-picker {
+    width: min(342px, calc(100vw - 54px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guestbook-gif-button,
+  .guestbook-gif-result img {
+    transition: none;
+  }
+}
+
+.guestbook-link {
+  color: #818cf8;
+  text-decoration: underline;
+  text-decoration-color: rgba(129, 140, 248, 0.45);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.guestbook-link:hover {
+  color: #a5b4fc;
+  text-decoration-color: currentColor;
+}
+
+.guestbook-gif-results {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
 }

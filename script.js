@@ -29,6 +29,137 @@
 
 (function () {
   const header = document.querySelector(".site-header");
+  const links = Array.from(
+    document.querySelectorAll('.header-nav a[href^="#"]'),
+  );
+
+  if (!links.length) return;
+
+  const linkById = new Map(
+    links.map((link) => [link.getAttribute("href").slice(1), link]),
+  );
+  const targets = links
+    .map((link) => document.getElementById(link.getAttribute("href").slice(1)))
+    .filter(Boolean);
+  let activeId = null;
+  let pendingId = null;
+  let pendingDirection = 0;
+  let lastScrollY = window.scrollY;
+  let ticking = false;
+
+  function setActive(id) {
+    const nextId = linkById.has(id) ? id : "home";
+    if (activeId === nextId) return;
+
+    activeId = nextId;
+    links.forEach((link) => {
+      const isActive = link.getAttribute("href") === `#${nextId}`;
+      link.classList.toggle("is-active", isActive);
+      if (isActive) link.setAttribute("aria-current", "location");
+      else link.removeAttribute("aria-current");
+    });
+  }
+
+  function getMarkerPosition() {
+    const headerOffset = header ? header.offsetHeight + 24 : 80;
+    return (
+      window.scrollY + Math.min(headerOffset + window.innerHeight * 0.24, 260)
+    );
+  }
+
+  function getSectionAtScroll() {
+    const marker = getMarkerPosition();
+    let currentId = "home";
+
+    targets.forEach((target) => {
+      const top = target.getBoundingClientRect().top + window.scrollY;
+      if (top <= marker) currentId = target.id;
+    });
+
+    return currentId;
+  }
+
+  function syncActiveFromScroll() {
+    const currentScrollY = window.scrollY;
+    const movementDirection = Math.sign(currentScrollY - lastScrollY);
+
+    if (
+      pendingId &&
+      pendingDirection &&
+      movementDirection &&
+      movementDirection !== pendingDirection
+    ) {
+      pendingId = null;
+      pendingDirection = 0;
+    }
+
+    if (pendingId) {
+      const pendingTarget = document.getElementById(pendingId);
+      if (pendingTarget) {
+        const marker = getMarkerPosition();
+        const targetTop =
+          pendingTarget.getBoundingClientRect().top + currentScrollY;
+        setActive(pendingId);
+
+        if (Math.abs(targetTop - marker) <= 140) {
+          pendingId = null;
+          pendingDirection = 0;
+        }
+      } else {
+        pendingId = null;
+        pendingDirection = 0;
+      }
+    }
+
+    if (!pendingId) setActive(getSectionAtScroll());
+    lastScrollY = currentScrollY;
+  }
+
+  function scheduleActiveSync() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      syncActiveFromScroll();
+      ticking = false;
+    });
+  }
+
+  links.forEach((link) => {
+    link.addEventListener("click", () => {
+      const id = link.getAttribute("href").slice(1);
+      if (!linkById.has(id)) return;
+
+      const target = document.getElementById(id);
+      pendingId = id;
+      pendingDirection = target
+        ? Math.sign(
+            target.getBoundingClientRect().top +
+              window.scrollY -
+              window.scrollY,
+          )
+        : 0;
+      lastScrollY = window.scrollY;
+      setActive(id);
+      history.replaceState(null, "", `#${id}`);
+    });
+  });
+
+  window.addEventListener("hashchange", () => {
+    const id = window.location.hash.slice(1);
+    pendingId = null;
+    pendingDirection = 0;
+    setActive(id || "home");
+    scheduleActiveSync();
+  });
+  window.addEventListener("scroll", scheduleActiveSync, { passive: true });
+
+  const initialId = window.location.hash.slice(1);
+  setActive(initialId || getSectionAtScroll());
+  scheduleActiveSync();
+})();
+
+(function () {
+  const header = document.querySelector(".site-header");
   const threshold = 40;
   let ticking = false;
 
@@ -511,7 +642,7 @@ const playlist = [
 })();
 (function () {
   const sections = document.querySelectorAll(
-    ".about-card, .work-container, .skills-container, .tools-container, .contact-container",
+    ".about-card, .work-container, .skills-container, .tools-container, .repos-container, .contact-container",
   );
 
   if (!sections.length || !("IntersectionObserver" in window)) return;
@@ -586,7 +717,7 @@ function renderWorkCard(item, isLast) {
   const a = document.createElement("a");
   a.href = item.project_url || "#";
   a.target = "_blank";
-  a.className = isLast ? "work-card-last" : "work-card";
+  a.className = isLast ? "work-card" : "work-card";
 
   a.innerHTML = `
     <img src="${item.image_url}" class="work-logo" alt="${item.title}">
@@ -612,10 +743,42 @@ function renderSimpleCard(item, cardClass) {
   return div;
 }
 
+function escapeHtml(value = "") {
+  const node = document.createElement("span");
+  node.textContent = String(value);
+  return node.innerHTML;
+}
+
+function renderRepoCard(item) {
+  const link = document.createElement("a");
+  const repoUrl = item.project_url || "https://github.com/NS0T";
+  const description =
+    item.description || "An open-source experiment from my GitHub.";
+  const imageUrl =
+    item.image_url || "https://github.githubassets.com/favicons/favicon.svg";
+
+  link.className = "repo-card";
+  link.href = repoUrl;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.innerHTML = `
+    <div class="repo-card-top">
+      <img src="${escapeHtml(imageUrl)}" alt="" loading="lazy" class="repo-logo" onerror="this.src='https://github.githubassets.com/favicons/favicon.svg'">
+    </div>
+    <div class="repo-card-body">
+      <h3>${escapeHtml(item.title)}</h3>
+      <p>${escapeHtml(description)}</p>
+    </div>
+    <span class="repo-card-link">View repository <span aria-hidden="true">→</span></span>
+  `;
+  return link;
+}
+
 async function loadPortfolioItems() {
   const workGrid = $("work-grid");
   const skillsGrid = $("skills-grid");
   const toolsGrid = $("tools-grid");
+  const reposGrid = $("repos-grid");
 
   const { data, error } = await portfolioClient
     .from("portfolio_items")
@@ -624,6 +787,10 @@ async function loadPortfolioItems() {
 
   if (error) {
     console.error("Portfolio load error:", error);
+    if (reposGrid) {
+      reposGrid.innerHTML =
+        '<p class="repos-state">GitHub repos are unavailable right now.</p>';
+    }
     return;
   }
 
@@ -632,6 +799,7 @@ async function loadPortfolioItems() {
   const work = data.filter((item) => item.category === "work");
   const skills = data.filter((item) => item.category === "skills");
   const tools = data.filter((item) => item.category === "tools");
+  const repos = data.filter((item) => item.category === "repos");
 
   if (workGrid) {
     workGrid.innerHTML = "";
@@ -652,6 +820,16 @@ async function loadPortfolioItems() {
     tools.forEach((item) => {
       toolsGrid.appendChild(renderSimpleCard(item, "tools-card"));
     });
+  }
+
+  if (reposGrid) {
+    reposGrid.innerHTML = "";
+    if (repos.length) {
+      repos.forEach((item) => reposGrid.appendChild(renderRepoCard(item)));
+    } else {
+      reposGrid.innerHTML =
+        '<p class="repos-state">No repositories added yet. Check back soon.</p>';
+    }
   }
 }
 

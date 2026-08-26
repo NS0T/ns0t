@@ -61,8 +61,7 @@
                         <li><a href="#home" class="is-active">Home</a></li>
                         <li><a href="#work">Work</a></li>
                         <li><a href="#skills">Skills</a></li>
-                        <li><a href="#repos">Cool Things</a></li>
-                        <li><a href="#guestbook-title">Comments</a></li>
+                        <li><a href="#contact">Contact</a></li>
                     </ul>
                     <button
                         id="theme-toggle"
@@ -317,219 +316,313 @@
                 <span class="github-contributions-loading">Loading contributions…</span>
             </div>
         </section>
-        
-        <div class="mp-card">
-            <div class="mp-cover" id="mp-cover-btn">
-                <img id="player-cover" src="music/cover/drake.jpg" alt="cover" />
+
+    <div class="mp-card">
+      <div class="mp-cover" id="mp-cover-btn">
+        <img id="player-cover" src="music/cover/drake.jpg" alt="cover" />
+      </div>
+
+      <div class="mp-info">
+        <div id="player-song" class="mp-song">Way 2 Sexy</div>
+        <div id="player-artist" class="mp-artist">Drake</div>
+      </div>
+
+      <div class="mp-sliders">
+        <div class="mp-slider-wrap">
+          <span class="mp-slider-title">Time</span>
+          <div class="mp-slider-track">
+            <div class="mp-slider-fill" id="progress-fill"></div>
+            <div class="mp-slider-thumb" id="progress-thumb"></div>
+            <input
+              type="range"
+              id="player-progress"
+              class="mp-vertical-range"
+              min="0"
+              max="100"
+              value="0"
+            />
+          </div>
+        </div>
+
+        <div class="mp-slider-wrap">
+          <span class="mp-slider-title">Volume</span>
+          <div class="mp-slider-track">
+            <div class="mp-slider-fill" id="volume-fill"></div>
+            <div class="mp-slider-thumb" id="volume-thumb"></div>
+            <input
+              type="range"
+              id="player-volume"
+              class="mp-vertical-range"
+              min="0"
+              max="100"
+              value="70"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="mp-controls">
+        <button id="player-prev" class="mp-btn" aria-label="Previous">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="8" height="8">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+          </svg>
+        </button>
+
+        <button id="player-play" class="mp-btn mp-btn-main" aria-label="Play">
+          <svg
+            id="player-play-icon"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            width="10"
+            height="10"
+          >
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          <svg
+            id="player-pause-icon"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            width="10"
+            height="10"
+            style="display: none"
+          >
+            <path d="M6 5h4v14H6zm8 0h4v14h-4z" />
+          </svg>
+        </button>
+
+        <button id="player-next" class="mp-btn" aria-label="Next">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="8" height="8">
+            <path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <audio id="player-audio"></audio>
+
+    <section class="section-divider"></section>
+
+    <h1 class="work-title" id="work">My Work</h1>
+
+    <div class="work-container">
+      <div class="work-grid" id="work-grid"></div>
+    </div>
+
+    <section class="section-divider"></section>
+
+    <h1 class="skills-title" id="skills">Skills</h1>
+
+    <div class="skills-container">
+      <div class="skills-grid" id="skills-grid"></div>
+    </div>
+
+    <h1 class="tools-title">Tools I use</h1>
+
+    <div class="tools-container">
+      <div class="tools-grid" id="tools-grid"></div>
+    </div>
+    <section class="section-divider"></section>
+
+    <h1 class="repos-title" id="repos">Cool Things</h1>
+
+    <div class="repos-container">
+      <div class="repos-heading">
+        <div>
+          <h2 id="repos-title">Cool Github repos</h2>
+          <p>Cool/Useful github repos I found</p>
+        </div>
+        <a
+          class="repos-profile-link"
+          href="https://github.com/NS0T"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View GitHub <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <div class="repos-grid" id="repos-grid">
+        <p class="repos-state">No repositories added yet.</p>
+      </div>
+    </div>
+
+    <section class="section-divider"></section>
+
+    <section
+      class="guestbook-section"
+      id="guestbook"
+      aria-labelledby="guestbook-title"
+    >
+      <div class="guestbook-heading">
+        <h2 id="guestbook-title">Leave a comment</h2>
+      </div>
+
+      <div class="guestbook-layout">
+        <form id="guestbook-form" class="guestbook-form">
+          <div class="guestbook-field">
+            <label for="guestbook-name">Nickname <span>(optional)</span></label>
+            <input
+              id="guestbook-name"
+              name="name"
+              type="text"
+              maxlength="32"
+              autocomplete="nickname"
+              autocapitalize="words"
+              placeholder="Name (optional)"
+            />
+          </div>
+
+          <div class="guestbook-field">
+            <div class="guestbook-label-row">
+              <label for="guestbook-message">Your message</label>
+              <span id="guestbook-char-count" aria-live="polite">0 / 500</span>
             </div>
+            <div class="guestbook-message-composer">
+              <textarea
+                id="guestbook-message"
+                name="message"
+                maxlength="500"
+                autocapitalize="sentences"
+                placeholder="Say something nice..."
+              ></textarea>
 
-            <div class="mp-info">
-                <div id="player-song" class="mp-song">Way 2 Sexy</div>
-                <div id="player-artist" class="mp-artist">Drake</div>
-            </div>
-
-            <div class="mp-sliders">
-                <div class="mp-slider-wrap">
-                    <span class="mp-slider-title">Time</span>
-                    <div class="mp-slider-track">
-                        <div class="mp-slider-fill" id="progress-fill"></div>
-                        <div class="mp-slider-thumb" id="progress-thumb"></div>
-                        <input type="range" id="player-progress" class="mp-vertical-range" min="0" max="100" value="0" />
-                    </div>
-                </div>
-
-                <div class="mp-slider-wrap">
-                    <span class="mp-slider-title">Volume</span>
-                    <div class="mp-slider-track">
-                        <div class="mp-slider-fill" id="volume-fill"></div>
-                        <div class="mp-slider-thumb" id="volume-thumb"></div>
-                        <input type="range" id="player-volume" class="mp-vertical-range" min="0" max="100" value="70" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="mp-controls">
-                <button id="player-prev" class="mp-btn" aria-label="Previous">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="8" height="8"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+              <div class="guestbook-composer-tools">
+                <button
+                  id="guestbook-gif-button"
+                  class="guestbook-gif-button"
+                  type="button"
+                  aria-label="Choose a GIF"
+                  aria-haspopup="dialog"
+                  aria-expanded="false"
+                >
+                  GIF
                 </button>
+              </div>
 
-                <button id="player-play" class="mp-btn mp-btn-main" aria-label="Play">
-                    <svg id="player-play-icon" viewBox="0 0 24 24" fill="currentColor" width="10" height="10"><path d="M8 5v14l11-7z"/></svg>
-                    <svg id="player-pause-icon" viewBox="0 0 24 24" fill="currentColor" width="10" height="10" style="display:none"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
-                </button>
-
-                <button id="player-next" class="mp-btn" aria-label="Next">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="8" height="8"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg>
-                </button>
-            </div>
-        </div>
-
-        <audio id="player-audio"></audio>
-
-
-
-        <section class="section-divider"></section>
-
-        <h1 class="work-title" id="work">My Work</h1>
-
-
-        <div class="work-container">
-            <div class="work-grid" id="work-grid">
-            </div>
-        </div>
-
-        <section class="section-divider"></section>
-
-
-
-        <h1 class="skills-title" id="skills">Skills</h1>
-
-        <div class="skills-container">
-            <div class="skills-grid" id="skills-grid">
-            </div>
-        </div>
-
-
-
-        <h1 class="tools-title">Tools I use</h1>
-
-        <div class="tools-container">
-            <div class="tools-grid" id="tools-grid">
-
-            </div>
-        </div>
-        <section class="section-divider"></section>
-
-        <h1 class="repos-title" id="repos">Cool Things</h1>
-
-        <section class="repos-container" aria-labelledby="repos-title">
-            <div class="repos-heading">
-                <div>
-                    <h2 id="repos-title">Cool Github repos</h2>
-                    <p>Cool/Useful github repos I found</p>
+              <section
+                id="guestbook-gif-picker"
+                class="guestbook-gif-picker"
+                role="dialog"
+                aria-modal="false"
+                aria-label="GIF picker"
+                hidden
+              >
+                <div class="guestbook-gif-picker-header">
+                  <strong>GIFs</strong>
+                  <button
+                    id="guestbook-gif-close"
+                    type="button"
+                    aria-label="Close GIF picker"
+                  >
+                    ×
+                  </button>
                 </div>
-                <a class="repos-profile-link" href="https://github.com/NS0T" target="_blank" rel="noopener noreferrer">
-                    View GitHub <span aria-hidden="true">↗</span>
-                </a>
-            </div>
-            <div class="repos-grid" id="repos-grid">
-                <p class="repos-state">No repositories added yet.</p>
-            </div>
-        </section>
-
-        <section class="section-divider"></section>
-
-        <section class="guestbook-section" id="guestbook" aria-labelledby="guestbook-title">
-            <div class="guestbook-heading">
-                <h2 id="guestbook-title">Leave a comment</h2>
-            </div>
-
-            <div class="guestbook-layout">
-                <form id="guestbook-form" class="guestbook-form">
-                    <div class="guestbook-field">
-                        <label for="guestbook-name">Nickname <span>(optional)</span></label>
-                        <input
-                            id="guestbook-name"
-                            name="name"
-                            type="text"
-                            maxlength="32"
-                            autocomplete="nickname"
-                            autocapitalize="words"
-                            placeholder="Name (optional)"
-                        />
-                    </div>
-
-                    <div class="guestbook-field">
-                        <div class="guestbook-label-row">
-                            <label for="guestbook-message">Your message</label>
-                            <span id="guestbook-char-count" aria-live="polite">0 / 500</span>
-                        </div>
-                        <div class="guestbook-message-composer">
-                            <textarea
-                            id="guestbook-message"
-                            name="message"
-                            maxlength="500"
-                            autocapitalize="sentences"
-                            placeholder="Say something nice..."
-                            ></textarea>
-
-
-                            <div class="guestbook-composer-tools">
-                                <button
-                                    id="guestbook-gif-button"
-                                    class="guestbook-gif-button"
-                                    type="button"
-                                    aria-label="Choose a GIF"
-                                    aria-haspopup="dialog"
-                                    aria-expanded="false"
-                                >GIF</button>
-                            </div>
-
-                            <section
-                                id="guestbook-gif-picker"
-                                class="guestbook-gif-picker"
-                                role="dialog"
-                                aria-modal="false"
-                                aria-label="GIF picker"
-                                hidden
-                            >
-                                <div class="guestbook-gif-picker-header">
-                                    <strong>GIFs</strong>
-                                    <button id="guestbook-gif-close" type="button" aria-label="Close GIF picker">×</button>
-                                </div>
-                                <label class="guestbook-gif-search-wrap">
-                                    <span class="guestbook-gif-search-icon" aria-hidden="true">⌕</span>
-                                    <input id="guestbook-gif-search" type="search" maxlength="100" autocomplete="off" placeholder="Search GIFs" aria-label="Search GIFs" />
-                                </label>
-                                <div id="guestbook-gif-results" class="guestbook-gif-results" aria-live="polite"></div>
-                                <p id="guestbook-gif-picker-status" class="guestbook-gif-picker-status">Trending GIFs</p>
-                                <div class="guestbook-gif-picker-footer">Powered by <span>Klipy</span></div>
-                            </section>
-                        </div>
-
-                        <div id="guestbook-gif-preview" class="guestbook-gif-preview" hidden>
-                            <img id="guestbook-gif-preview-image" alt="Selected GIF" />
-                            <button id="guestbook-gif-remove" type="button" aria-label="Remove selected GIF">Remove GIF</button>
-                        </div>
-                        <p id="error" role="alert"></p>
-                    </div>
-
-                    <label class="guestbook-honeypot" aria-hidden="true">
-                        Leave this field empty
-                        <input id="guestbook-website" name="website" type="text" tabindex="-1" autocomplete="off" />
-                    </label>
-
-                    <div class="guestbook-form-footer">
-                        <p id="guestbook-status" class="guestbook-status" aria-live="polite"></p>
-                        <div class="guestbook-form-actions">
-                            <button id="guestbook-cancel" class="guestbook-cancel" type="button" hidden>Cancel</button>
-                            <button id="guestbook-submit" class="guestbook-submit" type="submit">
-                                <span>Send comment</span>
-                                <span aria-hidden="true">→</span>
-                            </button>
-                            <a href="/privacy.html" class="word">How does it work?</a>
-                        </div>
-                    </div>
-                </form>
-
-                <div class="guestbook-feed-panel" aria-labelledby="guestbook-feed-title">
-                    <div class="guestbook-feed-header">
-                        <div>
-                            <h3 id="guestbook-feed-title">Comments</h3>
-                        </div>
-                        <span id="guestbook-count" class="guestbook-count">Loading...</span>
-                    </div>
-                    <div id="guestbook-list" class="guestbook-list" aria-live="polite">
-                        <p class="guestbook-state">Loading comments...</p>
-                    </div>
+                <label class="guestbook-gif-search-wrap">
+                  <span class="guestbook-gif-search-icon" aria-hidden="true"
+                    >⌕</span
+                  >
+                  <input
+                    id="guestbook-gif-search"
+                    type="search"
+                    maxlength="100"
+                    autocomplete="off"
+                    placeholder="Search GIFs"
+                    aria-label="Search GIFs"
+                  />
+                </label>
+                <div
+                  id="guestbook-gif-results"
+                  class="guestbook-gif-results"
+                  aria-live="polite"
+                ></div>
+                <p
+                  id="guestbook-gif-picker-status"
+                  class="guestbook-gif-picker-status"
+                >
+                  Trending GIFs
+                </p>
+                <div class="guestbook-gif-picker-footer">
+                  Powered by <span>Klipy</span>
                 </div>
+              </section>
             </div>
-        </section>
-        <div class="easter-egg" id="easteregg">
-            <a href="easteregg.html">?</a>
+
+            <div
+              id="guestbook-gif-preview"
+              class="guestbook-gif-preview"
+              hidden
+            >
+              <img id="guestbook-gif-preview-image" alt="Selected GIF" />
+              <button
+                id="guestbook-gif-remove"
+                type="button"
+                aria-label="Remove selected GIF"
+              >
+                Remove GIF
+              </button>
+            </div>
+            <p id="error" role="alert"></p>
+          </div>
+
+          <label class="guestbook-honeypot" aria-hidden="true">
+            Leave this field empty
+            <input
+              id="guestbook-website"
+              name="website"
+              type="text"
+              tabindex="-1"
+              autocomplete="off"
+            />
+          </label>
+
+          <div class="guestbook-form-footer">
+            <p
+              id="guestbook-status"
+              class="guestbook-status"
+              aria-live="polite"
+            ></p>
+            <div class="guestbook-form-actions">
+              <button
+                id="guestbook-cancel"
+                class="guestbook-cancel"
+                type="button"
+                hidden
+              >
+                Cancel
+              </button>
+              <button
+                id="guestbook-submit"
+                class="guestbook-submit"
+                type="submit"
+              >
+                <span>Send comment</span>
+                <span aria-hidden="true">→</span>
+              </button>
+              <a href="/privacy.html" class="word">How does it work?</a>
+            </div>
+          </div>
+        </form>
+
+        <div
+          class="guestbook-feed-panel"
+          aria-labelledby="guestbook-feed-title"
+        >
+          <div class="guestbook-feed-header">
+            <div>
+              <h3 id="guestbook-feed-title">Comments</h3>
+            </div>
+            <span id="guestbook-count" class="guestbook-count">Loading...</span>
+          </div>
+          <div id="guestbook-list" class="guestbook-list" aria-live="polite">
+            <p class="guestbook-state">Loading comments...</p>
+          </div>
         </div>
-        
-        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>   
-        <script src="script.js"></script>
-    </body>
+      </div>
+    </section>
+    <div class="easter-egg" id="easteregg">
+      <a href="easteregg.html">?</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+  </body>
 </html>

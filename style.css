@@ -1147,11 +1147,11 @@ html[data-theme="dark"] .theme-icon-moon {
 }
 
 .section-divider {
-  width: 1200px;
+  width: min(1200px, 90vw);
   height: 1px;
   background: #2f343d;
   position: relative;
-  left: 10%;
+  left: 20%;
   transform: translateX(-50%);
   margin: 80px 0;
   top: 10dvh;
@@ -1417,36 +1417,166 @@ html[data-theme="dark"] .theme-icon-moon {
 }
 
 .repos-title {
-  font-size: 100px;
+  font-size: clamp(42px, 5vw, 100px);
   text-align: center;
-  display: block;
-  width: 100%;
-  margin: 100px 0;
+  width: min(1200px, calc(100% - 40px));
+  margin: 76px auto 48px;
+  line-height: 1.05;
   white-space: nowrap;
-  position: relative;
-  left: -275px;
-  margin-bottom: 40px;
 }
 .repos-container {
-  position: relative;
-  left: 15%;
-  transform: translateX(-50%);
-  width: min(1200px, calc(80vw - 60px));
-  max-width: none;
-  flex: 0 0 auto;
-  margin: 0 0 110px;
-  padding: 46px 56px 52px;
+  width: max(1200px, calc(100% - 40px));
+  margin: 0 auto 72px;
+  padding: clamp(30px, 5vw, 46px) clamp(20px, 5vw, 56px) 52px;
+
   background: var(--card-bg-alt);
   border-radius: 28px;
-  margin-bottom: -80px;
+
+  box-sizing: border-box;
+}
+
+@media (max-width: 1920px) {
+  .repos-container {
+    margin-left: -580px;
+    margin-bottom: -80px;
+  }
+  .repos-title {
+    margin-left: -200px;
+  }
+}
+
+@media (max-width: 1600px) {
+  .repos-title {
+    font-size: clamp(42px, 5vw, 100px);
+    text-align: center;
+    width: min(1200px, calc(100% - 40px));
+    margin: 76px auto 48px;
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+  .repos-container {
+    width: max(1200px, calc(100% - 40px));
+    margin: 0 auto 72px;
+    padding: clamp(30px, 5vw, 46px) clamp(20px, 5vw, 56px) 52px;
+
+    background: var(--card-bg-alt);
+    border-radius: 28px;
+
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 1210px) {
+  .repos-title {
+    font-size: clamp(42px, 5vw, 100px);
+    text-align: center;
+    width: min(1200px, calc(100% - 40px));
+    margin: 76px auto 48px;
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+  .repos-container {
+    width: max(1000px, calc(100% - 40px));
+    margin: 0 auto 72px;
+    padding: clamp(30px, 5vw, 46px) clamp(20px, 5vw, 56px) 52px;
+
+    background: var(--card-bg-alt);
+    border-radius: 28px;
+
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 1110px) {
+  .repos-title {
+    font-size: clamp(42px, 5vw, 100px);
+    text-align: center;
+    width: min(1200px, calc(100% - 40px));
+    margin: 76px auto 48px;
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+  .repos-container {
+    width: max(900px, calc(100% - 40px));
+    margin: 0 auto 72px;
+    padding: clamp(30px, 5vw, 46px) clamp(20px, 5vw, 56px) 52px;
+
+    background: var(--card-bg-alt);
+    border-radius: 28px;
+
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 910px) {
+  .repos-title {
+    font-size: clamp(42px, 5vw, 100px);
+    text-align: center;
+    width: min(1200px, calc(100% - 40px));
+    margin: 76px auto 48px;
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+  .repos-container {
+    width: max(750px, calc(100% - 40px));
+    margin: 0 auto 72px;
+    padding: clamp(30px, 5vw, 46px) clamp(20px, 5vw, 56px) 52px;
+
+    background: var(--card-bg-alt);
+    border-radius: 28px;
+
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 760px) {
+  .repos-title {
+    font-size: clamp(42px, 5vw, 100px);
+    text-align: center;
+    width: min(1200px, calc(100% - 40px));
+    margin: 76px auto 48px;
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+  .repos-container {
+    width: max(650px, calc(100% - 40px));
+    margin: 0 auto 72px;
+    padding: clamp(30px, 5vw, 46px) clamp(20px, 5vw, 56px) 52px;
+
+    background: var(--card-bg-alt);
+    border-radius: 28px;
+
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 660px) {
+  .repos-title {
+    font-size: clamp(42px, 5vw, 100px);
+    text-align: center;
+    width: min(1200px, calc(100% - 40px));
+    margin: 76px auto 48px;
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+  .repos-container {
+    width: max(550px, calc(100% - 40px));
+    margin: 0 auto 72px;
+    padding: clamp(30px, 5vw, 46px) clamp(20px, 5vw, 56px) 52px;
+
+    background: var(--card-bg-alt);
+    border-radius: 28px;
+
+    box-sizing: border-box;
+  }
 }
 
 .repos-container.reveal {
-  transform: translateX(-50%) translateY(22px);
+  transform: translateY(22px);
 }
 
 .repos-container.reveal.is-visible {
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
 }
 
 .repos-heading {
@@ -1498,10 +1628,12 @@ html[data-theme="dark"] .theme-icon-moon {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
+  min-width: 0;
 }
 
 .repo-card {
   min-height: 220px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   padding: 24px;
@@ -1510,6 +1642,8 @@ html[data-theme="dark"] .theme-icon-moon {
   background: #0b0b0d;
   color: #fff;
   text-decoration: none;
+  width: 100%;
+  box-sizing: border-box;
   transition:
     transform 0.25s ease,
     border-color 0.25s ease,
@@ -1553,6 +1687,7 @@ html[data-theme="dark"] .theme-icon-moon {
 }
 
 .repo-card-body {
+  min-width: 0;
   margin-top: auto;
 }
 
@@ -1593,90 +1728,17 @@ html[data-theme="dark"] .theme-icon-moon {
   text-align: center;
 }
 
-@media (max-width: 1600px) {
-  .repos-title {
-    transform: none;
-    width: calc(100% - 40px);
-    margin: 76px auto 48px;
-    font-size: 80px;
-    white-space: normal;
-  }
-
-  .repos-container {
-    left: auto;
-    transform: none;
-    width: calc(100% - 40px);
-    max-width: 1000px;
-    width: 1000px;
-    margin: 0 auto 72px;
-    padding: 42px 32px 46px;
-  }
-
-  .repos-title {
-    font-size: 100px;
-    text-align: center;
-    display: block;
-    width: 100%;
-    margin: 100px 0;
-    white-space: nowrap;
-    position: relative;
-    left: 20px;
-  }
-
-  .repo-card {
-    width: 350px;
-  }
-
-  .repos-container.reveal,
-  .repos-container.reveal.is-visible {
-    transform: none;
-  }
-}
-
-@media (max-width: 900px) {
-  .repos-title {
-    transform: none;
-    width: calc(100% - 40px);
-    margin: 76px auto 48px;
-    font-size: 80px;
-    white-space: normal;
-  }
-
-  .repos-container {
-    left: auto;
-    transform: none;
-    width: calc(100% - 40px);
-    max-width: 1200px;
-    margin: 0 auto 72px;
-    padding: 42px 32px 46px;
-  }
-
-  .repos-title {
-    font-size: 100px;
-    text-align: center;
-    display: block;
-    width: 100%;
-    margin: 100px 0;
-    white-space: nowrap;
-    position: relative;
-    left: 20px;
-  }
-
-  .repos-container.reveal,
-  .repos-container.reveal.is-visible {
-    transform: none;
-  }
-}
-
 @media (max-width: 600px) {
   .repos-title {
-    width: calc(180% - 32px);
+    inline-size: calc(100vw - 32px);
+    max-inline-size: calc(100vw - 32px);
     margin: 56px auto 36px;
     font-size: min(18vw, 68px);
   }
 
   .repos-container {
-    width: calc(100% - 32px);
+    inline-size: calc(100vw - 32px);
+    max-inline-size: calc(100vw - 32px);
     padding: 32px 20px 36px;
   }
 
@@ -1708,7 +1770,6 @@ html[data-theme="dark"] .theme-icon-moon {
     line-height: 1;
     text-align: center;
     transform: none;
-    transform: translate(270deg);
   }
 
   .profile-card-container,
@@ -1752,12 +1813,10 @@ html[data-theme="dark"] .theme-icon-moon {
     margin: 0 auto 24px;
   }
 
-  .section-divider {
-    width: calc(90% - 40px);
-    left: auto;
-    top: auto;
-    margin: 26px 100px;
-    transform: none;
+  @media (max-width: 1600px) {
+    .section-divider {
+      visibility: hidden;
+    }
   }
 
   .work-title,
@@ -1846,8 +1905,9 @@ html[data-theme="dark"] .theme-icon-moon {
   .about-card {
     width: calc(100% - 32px);
   }
-
-  .section-divider,
+  .section-divider {
+    visibility: hidden;
+  }
   .work-title,
   .skills-title,
   .tools-title,
@@ -1856,7 +1916,6 @@ html[data-theme="dark"] .theme-icon-moon {
   .tools-container {
     width: calc(100% - 32px);
   }
-
   .work-container,
   .skills-container,
   .tools-container {
@@ -2851,6 +2910,9 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
   background: var(--card-bg-alt);
   border: 1px solid var(--card-border);
   border-radius: 28px;
+  width: 100%;
+  max-width: 850px;
+  margin-left: 15px;
   box-shadow:
     0 18px 40px var(--card-shadow-1),
     inset 0 1px var(--card-inset);

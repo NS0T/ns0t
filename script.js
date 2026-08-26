@@ -1718,7 +1718,9 @@ window.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
 
       const authorName = nameInput.value.replace(/\s+/g, " ").trim();
-      const replyMessage = messageInput.value.trim();
+      // A GIF-only reply is valid, so store an empty text field as NULL.
+      const rawReplyMessage = messageInput.value.trim();
+      const replyMessage = rawReplyMessage || null;
       const replyGifUrl = selectedReplyGif?.url || null;
 
       if (authorName.length < 2 || authorName.length > 32) {
@@ -1728,7 +1730,10 @@ window.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      if ((!replyMessage && !replyGifUrl) || replyMessage.length > 500) {
+      if (
+        (!replyMessage && !replyGifUrl) ||
+        (replyMessage && replyMessage.length > 500)
+      ) {
         replyStatus.textContent =
           "Add a reply message or GIF. Messages can be up to 500 characters.";
         replyStatus.className = "guestbook-reply-status is-error";

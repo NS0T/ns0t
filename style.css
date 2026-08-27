@@ -25,7 +25,7 @@
 }
 
 html[data-theme="dark"] {
-  --page-bg: #0f0f11;
+  --page-bg: #0e0e0e;
   --text-strong: #f2f2f0;
   --text-muted: #b6b6b6;
   --card-bg: #1c1d20;
@@ -67,7 +67,7 @@ html[data-theme="dark"] {
 }
 
 html {
-  zoom: 110%;
+  zoom: 100%;
   overflow-x: hidden;
 }
 
@@ -296,8 +296,8 @@ html[data-theme="dark"] .theme-icon-moon {
 
 .main-title {
   margin-top: 330px;
-  margin-left: -150px;
-  font-size: 250px;
+  margin-left: -220px !important;
+  font-size: 300px;
   color: var(--text-strong);
   transform: rotate(-270deg);
   display: inline-block;
@@ -904,8 +904,8 @@ html[data-theme="dark"] .theme-icon-moon {
 
 .about-card {
   position: absolute;
-  left: 360px;
-  width: 400px;
+  left: 440px;
+  width: calc(300% - 400px);
   background: var(--card-bg);
   border-radius: 22px;
   padding: 30px;
@@ -1145,25 +1145,12 @@ html[data-theme="dark"] .theme-icon-moon {
   line-height: 1;
   margin: 0;
 }
-
-.section-divider {
-  width: min(1200px, 90vw);
-  height: 1px;
-  background: #2f343d;
-  position: relative;
-  left: 20%;
-  transform: translateX(-50%);
-  margin: 80px 0;
-  top: 10dvh;
-  border: none;
-}
-
 .work-container {
   position: relative;
   max-width: 1800px;
   width: 1200px;
   left: -475px;
-  top: 200px;
+  top: 50px;
   margin: 0 auto 160px;
   padding: 100px;
   background: var(--card-bg-alt);
@@ -1259,9 +1246,8 @@ html[data-theme="dark"] .theme-icon-moon {
   display: block;
   width: 100%;
   margin: 100px 0;
-
+  top: -140px;
   position: relative;
-  left: -180px;
 }
 
 @media (max-width: 900px) {
@@ -1275,7 +1261,7 @@ html[data-theme="dark"] .theme-icon-moon {
 .skills-container {
   max-width: 1200px;
   margin: 30px -550px;
-  margin-top: -100px;
+  margin-top: -220px;
   padding: 60px 40px;
   background: var(--card-bg-alt);
   border-radius: 28px;
@@ -1350,7 +1336,7 @@ html[data-theme="dark"] .theme-icon-moon {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: -80px;
+  margin-bottom: -20px;
 }
 
 .tools-title {
@@ -1360,6 +1346,7 @@ html[data-theme="dark"] .theme-icon-moon {
   width: 100%;
   margin: 100px -200px;
   white-space: nowrap;
+  margin-top: -10px;
 }
 
 @media (max-width: 900px) {
@@ -1423,6 +1410,7 @@ html[data-theme="dark"] .theme-icon-moon {
   margin: 76px auto 48px;
   line-height: 1.05;
   white-space: nowrap;
+  margin-left: -120px !important;
 }
 .repos-container {
   width: max(1200px, calc(100% - 40px));
@@ -1431,7 +1419,7 @@ html[data-theme="dark"] .theme-icon-moon {
 
   background: var(--card-bg-alt);
   border-radius: 28px;
-
+  margin-bottom: 10px !important;
   box-sizing: border-box;
 }
 
@@ -1813,12 +1801,6 @@ html[data-theme="dark"] .theme-icon-moon {
     margin: 0 auto 24px;
   }
 
-  @media (max-width: 1600px) {
-    .section-divider {
-      visibility: hidden;
-    }
-  }
-
   .work-title,
   .skills-title,
   .tools-title {
@@ -1884,11 +1866,6 @@ html[data-theme="dark"] .theme-icon-moon {
     padding: 12px 16px;
   }
 
-  .main-title {
-    margin-top: 116px;
-    font-size: min(24vw, 130px);
-  }
-
   .profile-card-container {
     padding: 0 16px;
   }
@@ -1904,9 +1881,6 @@ html[data-theme="dark"] .theme-icon-moon {
   .profile-sidebar,
   .about-card {
     width: calc(100% - 32px);
-  }
-  .section-divider {
-    visibility: hidden;
   }
   .work-title,
   .skills-title,
@@ -2541,6 +2515,7 @@ html[data-theme="dark"] .music-card:hover .lastfm-label {
     border-color 0.3s ease,
     box-shadow 0.3s ease;
   overflow: hidden;
+  margin-bottom: 170px;
 }
 
 .github-contributions-header {
@@ -3873,4 +3848,119 @@ html[data-theme="dark"] .github-calendar-day[data-level="4"] {
 
 .guestbook-reply-gif-remove {
   padding: 5px 6px;
+}
+.section-divider {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80vw;
+  height: 1px;
+  background: #000;
+  margin: 80px 0;
+}
+
+@media (min-width: 1601px) {
+  .profile-card-container {
+    left: calc(50% - 610px);
+  }
+
+  .profile-sidebar {
+    left: calc(50% - 170px);
+  }
+
+  .github-contributions {
+    margin-left: -260px;
+  }
+
+  .work-container {
+    left: -430px;
+  }
+
+  .skills-title {
+    left: -30px;
+  }
+
+  .skills-container {
+    margin-left: -445px;
+  }
+
+  .tools-title {
+    margin-left: -30px;
+  }
+
+  .tools-container {
+    margin-left: -345px;
+  }
+
+  .repos-title {
+    margin-left: 50px;
+  }
+
+  .repos-container {
+    margin-left: -430px;
+  }
+
+  .guestbook-section {
+    margin-left: -330px;
+  }
+}
+
+.music-card,
+.small-card,
+.links-card {
+  margin-left: 100px;
+}
+
+.profile-card {
+  left: 80px;
+}
+
+.tools-title,
+.skills-title {
+  margin-left: -50px !important;
+}
+
+@media (max-width: 1600px) {
+  .main-title {
+    margin-top: 116px;
+    font-size: min(24vw, 180px);
+    margin-left: 0 !important;
+  }
+
+  .profile-card,
+  .music-card,
+  .small-card,
+  .links-card {
+    width: min(420px, calc(100% - 40px));
+    margin: 0 auto 24px;
+    position: static;
+  }
+
+  .tools-title,
+  .skills-title,
+  .repos-title {
+    margin-left: 3% !important;
+  }
+
+  .skills-title {
+    margin-bottom: -90px;
+  }
+
+  .section-divider {
+    margin-bottom: 190px;
+  }
+}
+
+html[data-theme="dark"] .section-divider {
+  background-color: #3f3e3e !important;
+}
+
+@media (max-width: 600px) {
+  .repos-title {
+    font-size: 50px;
+    margin-top: -120px;
+  }
+  .work-title {
+    margin-top: -120px;
+  }
 }

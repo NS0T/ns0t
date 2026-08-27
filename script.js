@@ -1718,7 +1718,6 @@ window.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
 
       const authorName = nameInput.value.replace(/\s+/g, " ").trim();
-      // A GIF-only reply is valid, so store an empty text field as NULL.
       const rawReplyMessage = messageInput.value.trim();
       const replyMessage = rawReplyMessage || null;
       const replyGifUrl = selectedReplyGif?.url || null;

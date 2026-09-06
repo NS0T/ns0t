@@ -272,38 +272,6 @@ function setImage(img, placeholder, src) {
   img.src = src;
 }
 
-function setBanner(user) {
-  const bannerBox = $("profile-banner");
-  const bannerImg = $("profile-banner-img");
-  const profileCard = document.querySelector(".profile-card");
-
-  if (!bannerBox || !bannerImg) return;
-
-  if (!user || !user.banner) {
-    bannerImg.onload = null;
-    bannerImg.onerror = null;
-    bannerImg.removeAttribute("src");
-    bannerBox.hidden = true;
-    if (profileCard) profileCard.classList.remove("has-banner");
-    return;
-  }
-
-  const ext = user.banner.startsWith("a_") ? "gif" : "png";
-  const bannerURL = `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${ext}?size=600`;
-
-  bannerImg.onload = () => {
-    bannerBox.hidden = false;
-    if (profileCard) profileCard.classList.add("has-banner");
-  };
-
-  bannerImg.onerror = () => {
-    bannerBox.hidden = true;
-    if (profileCard) profileCard.classList.remove("has-banner");
-  };
-
-  bannerImg.src = bannerURL;
-}
-
 function setAvatarDecoration(user) {
   const deco = $("avatar-decoration");
   if (!deco) return;
@@ -347,7 +315,6 @@ async function updateLanyard() {
     const avatarURL = `https://cdn.discordapp.com/avatars/${data.discord_user.id}/${data.discord_user.avatar}.png?size=512`;
 
     setImage(avatar, avatarPlaceholder, avatarURL);
-    setBanner(data.discord_user);
     setAvatarDecoration(data.discord_user);
 
     $("discord-username").textContent =
@@ -862,12 +829,12 @@ function SmoothScroll(target, speed, smooth) {
     if (scrollableParent) {
       const atTop = scrollableParent.scrollTop <= 0;
       const atBottom =
-        Math.ceil(scrollableParent.scrollTop + scrollableParent) >=
+        Math.ceil(scrollableParent.scrollTop + scrollableParent.clientHeight) >=
         scrollableParent.scrollHeight;
 
       const scrollingdown = e.deltaY > 0;
 
-      if (!(scrollingdown && atBottom) && !(!sccrollingdown && atTop)) {
+      if (!(scrollingdown && atBottom) && !(!scrollingdown && atTop)) {
         return;
       }
     }
@@ -940,53 +907,6 @@ function SmoothScroll(target, speed, smooth) {
 window.addEventListener("DOMContentLoaded", () => {
   SmoothScroll(document, 200, 12);
 });
-
-(function () {
-  function updateDynamicTooltips() {
-    const now = new Date();
-
-    const bdayLink = document.getElementById("birthday-link");
-    if (bdayLink) {
-      let nextBday = new Date(now.getFullYear(), 11, 1);
-      if (now > nextBday) nextBday.setFullYear(now.getFullYear() + 1);
-
-      const diff = nextBday - now;
-      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const m = Math.floor((diff / (1000 * 60)) % 60);
-      bdayLink.setAttribute(
-        "data-tooltip",
-        `im born in 1/12, Next in: ${d}d ${h}h ${m}m `,
-      );
-    }
-
-    const codingLink = document.getElementById("coding-link");
-    if (codingLink) {
-      const currentMonth = now.toLocaleString("en-US", { month: "long" });
-      const startDate = new Date(2026, 0, 1);
-
-      let totalMonths =
-        (now.getFullYear() - startDate.getFullYear()) * 12 +
-        (now.getMonth() - startDate.getMonth());
-
-      let exp = "";
-      if (totalMonths < 12) {
-        exp = `${totalMonths} months`;
-      } else {
-        const yrs = Math.floor(totalMonths / 12);
-        const mos = totalMonths % 12;
-        exp = `${yrs} year${yrs > 1 ? "s" : ""} ${mos > 0 ? `and ${mos} month${mos > 1 ? "s" : ""}` : ""}`;
-      }
-      codingLink.setAttribute(
-        "data-tooltip",
-        `its july when i typed this now its ${currentMonth} and i've been coding for ${exp} now `,
-      );
-    }
-  }
-
-  updateDynamicTooltips();
-  setInterval(updateDynamicTooltips, 60000);
-})();
 
 (function syncGitHubGraphTheme() {
   const graph = document.querySelector(".github-contributions-image");

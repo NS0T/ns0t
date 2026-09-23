@@ -90,6 +90,8 @@ CREATE TABLE IF NOT EXISTS guestbook_comments (
     email TEXT,
     message TEXT NOT NULL,
     website_url TEXT,
+    gif_url TEXT,
+    owner_token_hash TEXT,
     is_approved BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -110,7 +112,10 @@ CREATE TABLE IF NOT EXISTS guestbook_replies (
         REFERENCES guestbook_comments(id) ON DELETE CASCADE,
     user_id UUID
         REFERENCES users(id) ON DELETE SET NULL,
+    author_name TEXT,
     message TEXT NOT NULL,
+    gif_url TEXT,
+    owner_token_hash TEXT,
     is_published BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP

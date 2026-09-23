@@ -414,16 +414,16 @@ updateAmmanTime();
 setInterval(updateAmmanTime, 1000);
 const playlist = [
   {
-    name: "BLITZ!",
-    artist: "SSJ Daki",
-    src: "music/BLITZ!.mp3",
-    cover: "music/cover/blitz.jpg",
-  },
-  {
     name: "Landed",
     artist: "Drake",
     src: "music/Landed.mp3",
     cover: "music/cover/Landed.jpg",
+  },
+  {
+    name: "Way 2 Sexy",
+    artist: "Drake",
+    src: "music/Way2Sexy.mp3",
+    cover: "music/cover/drake.jpg",
   },
   {
     name: "Figure.09",
@@ -436,12 +436,6 @@ const playlist = [
     artist: "Lithe",
     src: "music/Jezebel.mp3",
     cover: "music/cover/lithe.jpg",
-  },
-  {
-    name: "Way 2 Sexy",
-    artist: "Drake",
-    src: "music/Way2Sexy.mp3",
-    cover: "music/cover/drake.jpg",
   },
   {
     name: "Let It Happen",
@@ -466,6 +460,12 @@ const playlist = [
     artist: "Future",
     src: "music/One Two.mp3",
     cover: "music/cover/realme.jpg",
+  },
+  {
+    name: "BLITZ!",
+    artist: "SSJ Daki",
+    src: "music/BLITZ!.mp3",
+    cover: "music/cover/blitz.jpg",
   },
 ];
 
@@ -683,33 +683,65 @@ function setMarqueeText(el, text) {
   });
 })();
 
+function isSafeHttpUrl(value) {
+  try {
+    const url = new URL(String(value || ""), window.location.href);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function renderWorkCard(item, isLast) {
-  const a = document.createElement("a");
-  a.href = item.project_url || "#";
-  a.target = "_blank";
-  a.className = isLast ? "work-card" : "work-card";
+  const link = document.createElement("a");
+  link.className = "work-card";
 
-  a.innerHTML = `
-    <img src="${item.image_url}" class="work-logo" alt="${item.title}">
-    <div class="work-card-info">
-      <h4 class="work-name">${item.title}</h4>
-      <p class="work-summary">${item.description || ""}</p>
-    </div>
-    <span class="work-arrow">&rarr;</span>
-  `;
+  if (isSafeHttpUrl(item.project_url)) {
+    link.href = item.project_url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+  } else {
+    link.href = "#";
+  }
 
-  return a;
+  const image = document.createElement("img");
+  image.className = "work-logo";
+  image.alt = String(item.title || "");
+  if (isSafeHttpUrl(item.image_url)) image.src = item.image_url;
+
+  const info = document.createElement("div");
+  info.className = "work-card-info";
+
+  const title = document.createElement("h4");
+  title.className = "work-name";
+  title.textContent = String(item.title || "");
+
+  const summary = document.createElement("p");
+  summary.className = "work-summary";
+  summary.textContent = String(item.description || "");
+
+  const arrow = document.createElement("span");
+  arrow.className = "work-arrow";
+  arrow.innerHTML = "&rarr;";
+
+  info.append(title, summary);
+  link.append(image, info, arrow);
+  return link;
 }
 
 function renderSimpleCard(item, cardClass) {
   const div = document.createElement("div");
   div.className = cardClass;
 
-  div.innerHTML = `
-    <img src="${item.image_url}" alt="${item.title}">
-    <h3 class="skill-name">${item.title}</h3>
-  `;
+  const image = document.createElement("img");
+  image.alt = String(item.title || "");
+  if (isSafeHttpUrl(item.image_url)) image.src = item.image_url;
 
+  const title = document.createElement("h3");
+  title.className = "skill-name";
+  title.textContent = String(item.title || "");
+
+  div.append(image, title);
   return div;
 }
 

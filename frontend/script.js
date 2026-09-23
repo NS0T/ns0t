@@ -414,11 +414,12 @@ updateAmmanTime();
 setInterval(updateAmmanTime, 1000);
 const playlist = [
   {
-    name: "Landed",
-    artist: "Drake",
-    src: "music/Landed.mp3",
-    cover: "music/cover/Landed.jpg",
+    name: "BLITZ!",
+    artist: "SSJ Daki",
+    src: "music/BLITZ!.mp3",
+    cover: "music/cover/blitz.jpg",
   },
+
   {
     name: "Way 2 Sexy",
     artist: "Drake",
@@ -443,6 +444,13 @@ const playlist = [
     src: "music/Let It Happen.mp3",
     cover: "music/cover/currents.jpg",
   },
+
+  {
+    name: "Landed",
+    artist: "Drake",
+    src: "music/Landed.mp3",
+    cover: "music/cover/Landed.jpg",
+  },
   {
     name: "loser.",
     artist: "Stheppi",
@@ -460,12 +468,6 @@ const playlist = [
     artist: "Future",
     src: "music/One Two.mp3",
     cover: "music/cover/realme.jpg",
-  },
-  {
-    name: "BLITZ!",
-    artist: "SSJ Daki",
-    src: "music/BLITZ!.mp3",
-    cover: "music/cover/blitz.jpg",
   },
 ];
 

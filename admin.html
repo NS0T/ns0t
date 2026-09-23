@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <link rel="icon" type="image/x-icon" href="/icon/favicon.ico" />
+    <link rel="stylesheet" href="admin.css" />
+
+    <title>Portfolio Admin</title>
+  </head>
+
+  <body>
+    <main class="shell">
+      <section id="auth-view" class="panel auth-panel" hidden>
+        <p class="eyebrow">Portfolio CMS</p>
+
+        <h1>Admin sign in</h1>
+
+        <form id="login-form">
+          <label>
+            Email
+            <input
+              id="login-email"
+              type="email"
+              autocomplete="email"
+              required
+            />
+          </label>
+
+          <label>
+            Password
+            <input
+              id="login-password"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          </label>
+
+          <button type="submit">Sign in</button>
+        </form>
+
+        <p id="login-status" class="status" aria-live="polite"></p>
+      </section>
+
+      <!-- Dashboard -->
+      <section id="dashboard" class="panel" hidden>
+        <header class="dashboard-header">
+          <div>
+            <p class="eyebrow">Portfolio CMS</p>
+            <h1>Admin dashboard</h1>
+          </div>
+
+          <button id="sign-out" class="secondary" type="button">
+            Sign out
+          </button>
+        </header>
+
+        <p id="dashboard-status" class="status" aria-live="polite"></p>
+
+        <!-- Portfolio management -->
+        <section id="portfolio-management">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Content</p>
+              <h2>Portfolio items</h2>
+            </div>
+
+            <button id="new-portfolio-item" type="button">Add item</button>
+          </div>
+
+          <p id="portfolio-status" class="status" aria-live="polite"></p>
+
+          <div id="portfolio-items-list">
+            <p class="empty-state">Loading portfolio items...</p>
+          </div>
+
+          <!-- Create/Edit form -->
+          <form id="portfolio-form" class="portfolio-form" hidden>
+            <div class="section-header">
+              <div>
+                <p class="eyebrow">Editor</p>
+                <h2 id="portfolio-form-title">Add portfolio item</h2>
+              </div>
+            </div>
+
+            <label>
+              Title
+              <input
+                id="portfolio-title"
+                type="text"
+                maxlength="200"
+                required
+              />
+            </label>
+
+            <label>
+              Description
+              <textarea
+                id="portfolio-description"
+                rows="5"
+                maxlength="5000"
+              ></textarea>
+            </label>
+
+            <label>
+              Project URL
+              <input
+                id="portfolio-project-url"
+                type="url"
+                placeholder="https://example.com"
+              />
+            </label>
+
+            <label>
+              Image file
+              <input
+                id="portfolio-image-file"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+              />
+              <small>Maximum size: 10 MB.</small>
+            </label>
+
+            <label>
+              Image URL
+              <input
+                id="portfolio-image-url"
+                type="url"
+                placeholder="Existing image URL"
+              />
+              <small>
+                Leave this unchanged when editing without replacing the image.
+              </small>
+            </label>
+
+            <p
+              id="portfolio-upload-status"
+              class="status"
+              aria-live="polite"
+            ></p>
+
+            <label>
+              Technologies
+              <input
+                id="portfolio-technologies"
+                type="text"
+                placeholder="Go, PostgreSQL, JavaScript"
+              />
+              <small>Separate technologies with commas.</small>
+            </label>
+
+            <label>
+              Category
+              <select id="portfolio-category" required>
+                <option value="work">Work</option>
+                <option value="skill">Skill</option>
+                <option value="tool">Tool</option>
+                <option value="repository">Repository</option>
+              </select>
+            </label>
+
+            <label>
+              Sort order
+              <input
+                id="portfolio-sort-order"
+                type="number"
+                min="0"
+                value="0"
+                required
+              />
+            </label>
+
+            <label class="checkbox-label">
+              <input id="portfolio-is-published" type="checkbox" checked />
+              Published
+            </label>
+
+            <div class="form-actions">
+              <button id="portfolio-submit" type="submit">Create item</button>
+
+              <button id="portfolio-cancel" class="secondary" type="button">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Comments moderation -->
+        <section id="comments-management" class="comments-admin">
+          <div class="comments-admin-header">
+            <div>
+              <p class="eyebrow">Moderation</p>
+              <h2>Comments</h2>
+            </div>
+          </div>
+
+          <p class="comments-admin-copy">
+            Publish, hide, or delete guestbook comments.
+          </p>
+
+          <div class="comments-admin-toolbar">
+            <label>
+              Filter
+              <select id="comments-filter">
+                <option value="all">All</option>
+                <option value="published">Published</option>
+                <option value="hidden">Hidden</option>
+              </select>
+            </label>
+
+            <p id="comments-count" class="comments-count"></p>
+          </div>
+
+          <p id="comments-admin-status" class="status" aria-live="polite"></p>
+
+          <div id="comments-admin-list" class="comments">
+            <p class="empty-state">Loading comments...</p>
+          </div>
+        </section>
+
+        <!-- Replies moderation -->
+        <section id="replies-management" class="replies-admin">
+          <div class="comments-admin-header">
+            <div>
+              <p class="eyebrow">Moderation</p>
+              <h2>Replies</h2>
+            </div>
+          </div>
+
+          <p class="comments-admin-copy">
+            Publish, hide, or delete guestbook replies.
+          </p>
+
+          <div class="comments-admin-toolbar">
+            <label>
+              Filter
+              <select id="replies-filter">
+                <option value="all">All</option>
+                <option value="published">Published</option>
+                <option value="hidden">Hidden</option>
+              </select>
+            </label>
+
+            <p id="replies-count" class="comments-count"></p>
+          </div>
+
+          <p id="replies-admin-status" class="status" aria-live="polite"></p>
+
+          <div id="replies-admin-list" class="comments">
+            <p class="empty-state">Loading replies...</p>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="admin.js"></script>
+  </body>
+</html>

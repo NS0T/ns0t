@@ -1841,7 +1841,6 @@ window.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify({
               name: authorName,
-              // Keep GIF-only replies supported by putting the URL in message.
               message: [replyMessage, replyGifUrl].filter(Boolean).join("\n"),
             }),
           },
@@ -2212,7 +2211,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
       const comments = (Array.isArray(body) ? body : []).map((comment) => ({
         ...comment,
-        // Keep the existing UI field names while Go returns name.
         author_name: comment.author_name ?? comment.name ?? "Anonymous",
         replies: (comment.replies || []).map((reply) => ({
           ...reply,
@@ -2356,8 +2354,6 @@ window.addEventListener("DOMContentLoaded", () => {
           },
           body: JSON.stringify({
             name,
-            // The current Go input accepts message only. Keep GIF-only posts usable
-            // by storing the selected GIF URL in the message for preview rendering.
             message: [message, gifUrl].filter(Boolean).join("\n"),
           }),
         });

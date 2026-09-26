@@ -227,13 +227,6 @@ function openEditForm(item) {
   byId("portfolio-description").value = item.description || "";
   byId("portfolio-project-url").value = item.project_url || "";
   byId("portfolio-image-url").value = item.image_url || "";
-  // FIX: this used to do byId("portfolio-image-file").value = ... , which
-  // throws in every browser (file inputs only allow their .value to be
-  // set to ""), and byId("cloudinary-public-id"/"cloudinary-resouce-type")
-  // which don't exist in admin.html — so clicking "Edit" crashed before
-  // any field got filled in. The cloudinary id/type just need to be
-  // tracked in JS so they're preserved in the payload if the image isn't
-  // replaced.
   portfolioImageFile.value = "";
   cloudinaryPublicID = item.cloudinary_public_id || "";
   cloudinaryResourceType = item.cloudinary_resource_type || "image";
@@ -501,17 +494,6 @@ async function handleDelete(id) {
   loadAdminPortfolio();
 }
 
-// --- Comments & replies moderation ---
-// There's no visible admin endpoint for the guestbook in this codebase yet.
-// This mirrors the existing portfolio admin conventions as closely as
-// possible:
-//   GET   /api/admin/guestbook                              -> list, each
-//         comment including its (possibly unpublished) `replies`
-//   PATCH  /api/admin/guestbook/{id}/publish                 body { is_published }
-//   DELETE /api/admin/guestbook/{id}
-//   PATCH  /api/admin/guestbook/{commentId}/reply/{replyId}/publish   body { is_published }
-//   DELETE /api/admin/guestbook/{commentId}/reply/{replyId}
-// Adjust the paths below if your Go API uses different ones.
 
 let adminCommentsCache = [];
 
@@ -556,9 +538,6 @@ async function loadAdminComments() {
 
   const items = rawItems.map((comment) => ({
     ...comment,
-
-    // جدول التعليقات يستخدم is_approved
-    // واجهة Admin تستخدم is_published
     is_published: comment.is_published ?? comment.is_approved ?? false,
 
     replies: Array.isArray(comment.replies)

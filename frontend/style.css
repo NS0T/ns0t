@@ -2673,7 +2673,7 @@ html[data-theme="dark"] .github-contributions-image {
   --github-graph-filter: invert(0.88) hue-rotate(180deg) brightness(0.82)
     contrast(1.12);
 }
- @media (max-width: 1600px) {
+@media (max-width: 1600px) {
   .github-contributions {
     top: 0;
     width: min(830px, calc(100vw - 40px));
